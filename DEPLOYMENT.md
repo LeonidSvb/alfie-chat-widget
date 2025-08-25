@@ -6,13 +6,14 @@
 2. Repository name: `alfie-chat-widget`  
 3. Description: `🦊 Alfie Chat Widget - AI Travel Concierge MVP with N8N Integration`
 4. Set to **Public**
-5. Click **Create repository**
+5. **DON'T** initialize with README (we already have files)
+6. Click **Create repository**
 
 ## Push to GitHub
 
 ```bash
 cd C:\Users\79818\Desktop\Outdoorable
-git remote add origin https://github.com/YOURUSERNAME/alfie-chat-widget.git
+git remote add origin https://github.com/LeonidSvb/alfie-chat-widget.git
 git branch -M main
 git push -u origin main
 ```
@@ -30,13 +31,13 @@ After GitHub Pages is live, use this embed code:
 
 ```html
 <div id="alfie-widget-container"></div>
-<script src="https://YOURUSERNAME.github.io/alfie-chat-widget/index.html"></script>
+<script src="https://leonidsvb.github.io/alfie-chat-widget/index.html"></script>
 ```
 
 ## Live Demo
 
 Once deployed, the widget will be available at:
-`https://YOURUSERNAME.github.io/alfie-chat-widget/`
+`https://leonidsvb.github.io/alfie-chat-widget/`
 
 ## N8N Webhooks
 
