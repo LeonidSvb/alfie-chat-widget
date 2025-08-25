@@ -1,0 +1,109 @@
+{
+  "name": "Alfie Intermediate Summaries",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST", 
+        "path": "alfie-intermediate"
+      },
+      "id": "webhook-intermediate",
+      "name": "Intermediate Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validate and process input data\nconst { answers = {}, current_question = 0, flow_type = '' } = $input.all()[0].json;\n\n// Basic validation\nif (!flow_type || !['destination_inspiration', 'trip_planning'].includes(flow_type)) {\n  throw new Error('Invalid flow_type');\n}\n\nif (current_question < 1) {\n  throw new Error('current_question must be >= 1');\n}\n\n// Calculate progress\nconst questionCount = Object.keys(answers).length;\nconst maxQuestions = flow_type === 'destination_inspiration' ? 16 : 11;\nconst progress = Math.round((questionCount / maxQuestions) * 100);\n\n// Format answers for Alfie\nconst answersText = Object.entries(answers)\n  .map(([q, a]) => `Q${q}: ${a}`)\n  .join('\\n');\n\n// Determine conversation stage\nlet stage = 'beginning';\nif (progress > 70) stage = 'nearing_end';\nelse if (progress > 30) stage = 'middle';\n\nreturn {\n  flow_type,\n  current_question,\n  progress,\n  stage,\n  answersText,\n  maxQuestions,\n  questionCount\n};"
+      },
+      "id": "process-input",
+      "name": "Process Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "operation": "create", 
+        "model": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are Alfie, a warm and witty fox who works as an adventure concierge. You're having an ongoing conversation with a traveler answering questions about their outdoor adventure preferences.\n\nPERSONALITY:\n- Warm, conversational tone with contractions\n- Self-aware humor about being a fox in a hoodie\n- Never mention being AI - you're an expert-driven adventure concierge\n- Always suggest 'beyond the obvious' insights\n- Use phrases like 'rangers feeding me the good stuff' or 'my network of guides'\n\nYour job: provide encouraging, personality-driven responses that:\n1. Acknowledge their answers so far\n2. Show enthusiasm for their adventure preferences  \n3. Drop hints about exciting possibilities\n4. Keep them engaged for remaining questions\n5. NEVER give final recommendations (that comes later)\n\nMatch tone to conversation stage: Beginning=excited, Middle=building anticipation, Nearing end=building excitement for final recommendations."
+            },
+            {
+              "role": "user", 
+              "content": "Flow: {{ $json.flow_type }} | Progress: {{ $json.progress }}% ({{ $json.questionCount }}/{{ $json.maxQuestions }}) | Stage: {{ $json.stage }}\n\nAnswers so far:\n{{ $json.answersText }}\n\nProvide an encouraging Alfie response that keeps them excited about completing the remaining questions."
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.8,
+          "maxTokens": 300
+        }
+      },
+      "id": "alfie-response",
+      "name": "Generate Alfie Response", 
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [600, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "PVUGFR4BRcDcdsZt",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{{ {\"success\": true, \"alfie_response\": $json.choices[0].message.content, \"metadata\": {\"flow_type\": $('Process Input').first().json.flow_type, \"progress\": $('Process Input').first().json.progress, \"stage\": $('Process Input').first().json.stage, \"timestamp\": $now.toISOString()}} }}"
+      },
+      "id": "respond-intermediate",
+      "name": "Respond Intermediate",
+      "type": "n8n-nodes-base.respondToWebhook", 
+      "typeVersion": 1,
+      "position": [800, 300]
+    }
+  ],
+  "connections": {
+    "Intermediate Webhook": {
+      "main": [
+        [
+          {
+            "node": "Process Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Input": {
+      "main": [
+        [
+          {
+            "node": "Generate Alfie Response",
+            "type": "main", 
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Alfie Response": {
+      "main": [
+        [
+          {
+            "node": "Respond Intermediate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "timezone": "America/New_York"
+  }
+}

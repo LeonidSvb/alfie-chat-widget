@@ -1,0 +1,224 @@
+{
+  "name": "Outdoorable Final Processing",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "final-processing"
+      },
+      "id": "webhook-final",
+      "name": "Final Processing Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "operation": "create",
+        "model": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are an expert travel analyst. Analyze the user's travel preferences and suggest 2-3 outdoor destinations. Return JSON format: {\"destinations\": [{\"name\": \"Location\", \"activities\": [\"activity1\", \"activity2\"], \"why_perfect\": \"reason\"}], \"search_queries\": [\"query1\", \"query2\"]}"
+            },
+            {
+              "role": "user", 
+              "content": "Travel preferences: {{ JSON.stringify($json.answers || {}) }}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.7,
+          "maxTokens": 500
+        }
+      },
+      "id": "analyze-preferences",
+      "name": "Analyze Travel Preferences",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [400, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "PVUGFR4BRcDcdsZt",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.perplexity.ai/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "llama-3.1-sonar-small-128k-online"
+            },
+            {
+              "name": "messages",
+              "value": "[{\"role\": \"system\", \"content\": \"Search for outdoor travel information. Focus on authentic local sources, avoid booking sites like Booking.com, Expedia. Prefer: AllTrails, National Park Service, local tourism boards, Outside Magazine, adventure blogs.\"}, {\"role\": \"user\", \"content\": \"{{ JSON.parse($('Analyze Travel Preferences').first().json.choices[0].message.content).search_queries[0] || 'outdoor adventures' }}\"}]"
+            }
+          ]
+        }
+      },
+      "id": "search-destinations",
+      "name": "Search Destination Info",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "operation": "list",
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": "appO1KtZMgg8P4IiR"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list", 
+          "value": "Experts"
+        },
+        "options": {}
+      },
+      "id": "find-experts",
+      "name": "Find Local Experts",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [800, 300],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "TlvcaDmp0On83I0S",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "operation": "create",
+        "model": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are Alfie, the adventure concierge fox. Create final travel recommendations combining destination analysis, web research, and local expert matches. Be warm, witty, and actionable. Include specific next steps and expert contact info."
+            },
+            {
+              "role": "user",
+              "content": "Create final recommendations based on: Destinations: {{ JSON.parse($('Analyze Travel Preferences').first().json.choices[0].message.content) }} Research: {{ $('Search Destination Info').first().json.choices[0].message.content }} Experts: {{ JSON.stringify($('Find Local Experts').all()) }}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.8,
+          "maxTokens": 800
+        }
+      },
+      "id": "generate-recommendations",
+      "name": "Generate Final Recommendations",
+      "type": "n8n-nodes-base.openAi", 
+      "typeVersion": 1,
+      "position": [1000, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "PVUGFR4BRcDcdsZt",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{{ {\"success\": true, \"recommendations\": $('Generate Final Recommendations').first().json.choices[0].message.content, \"destinations\": JSON.parse($('Analyze Travel Preferences').first().json.choices[0].message.content), \"experts\": $('Find Local Experts').all(), \"timestamp\": $now.toISOString()} }}"
+      },
+      "id": "final-response",
+      "name": "Final Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1200, 300]
+    }
+  ],
+  "connections": {
+    "Final Processing Webhook": {
+      "main": [
+        [
+          {
+            "node": "Analyze Travel Preferences",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Travel Preferences": {
+      "main": [
+        [
+          {
+            "node": "Search Destination Info",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Find Local Experts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Destination Info": {
+      "main": [
+        [
+          {
+            "node": "Generate Final Recommendations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Local Experts": {
+      "main": [
+        [
+          {
+            "node": "Generate Final Recommendations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Final Recommendations": {
+      "main": [
+        [
+          {
+            "node": "Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "timezone": "America/New_York"
+  }
+}

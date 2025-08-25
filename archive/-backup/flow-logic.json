@@ -1,0 +1,69 @@
+{
+  "destination_discovery": {
+    "step1": {
+      "type": "activity_selection",
+      "message": "🗺️ Отлично! Помогу найти идеальное место для приключений.\n\nКакой тип активности вас больше всего привлекает?",
+      "buttons": [
+        {"text": "🥾 Хайкинг", "value": "hiking"},
+        {"text": "🧗 Скалолазание", "value": "climbing"}, 
+        {"text": "🚣 Водные виды", "value": "kayaking"},
+        {"text": "🏔️ Альпинизм", "value": "mountaineering"},
+        {"text": "🚴 Велотуризм", "value": "cycling"}
+      ]
+    },
+    "step2": {
+      "type": "region_and_details",
+      "perplexity_query": "Лучшие места для {activity} в мире 2024. Топ-5 направлений с описанием сложности и сезонности",
+      "chatgpt_prompt": "Пользователь выбрал {activity}. Покажи топ-3 региона и задай уточняющие вопросы о сезоне, опыте и предпочтениях по континенту",
+      "show_expert": false
+    },
+    "step3": {
+      "type": "personalized_recommendations", 
+      "perplexity_query": "Детальная информация о {activity} в {region} в {season}. Погода, цены, доступность, лучшие маршруты",
+      "chatgpt_prompt": "Создай персональные рекомендации для {activity} в {region} в {season} для уровня {experience}",
+      "show_expert": true,
+      "expert_key": "{activity}_{region}"
+    }
+  },
+  "trip_planning": {
+    "step1": {
+      "type": "destination_input",
+      "message": "📋 Отлично! Создам идеальный план для вашего приключения.\n\nКуда планируете поехать?",
+      "show_expert": false
+    },
+    "step2": {
+      "type": "trip_details",
+      "message": "Сколько дней планируете? С кем путешествуете? Какой примерный бюджет?",
+      "show_expert": false  
+    },
+    "step3": {
+      "type": "detailed_itinerary",
+      "perplexity_query": "Актуальная информация о {destination}: погода в {dates}, цены, события, транспорт",
+      "chatgpt_prompt": "Создай детальный {duration}-дневный маршрут для {destination} с бюджетом {budget}",
+      "show_expert": true
+    }
+  },
+  "expert_advice": {
+    "step1": {
+      "type": "advice_type",
+      "message": "👨‍🏫 Подключаю наших экспертов!\n\nПо какому вопросу нужен совет?",
+      "buttons": [
+        {"text": "🎒 Снаряжение и экипировка", "value": "gear"},
+        {"text": "🗺️ Маршруты и планирование", "value": "routes"},
+        {"text": "🛡️ Безопасность", "value": "safety"},
+        {"text": "🌍 Выбор локации", "value": "location"}
+      ]
+    },
+    "step2": {
+      "type": "location_and_activity",
+      "message": "Где планируете активность? Какой вид спорта?",
+      "show_expert": false
+    },
+    "step3": {
+      "type": "expert_connection",
+      "airtable_priority": true,
+      "show_expert": true,
+      "fallback_message": "Скоро добавим эксперта по этому направлению!"
+    }
+  }
+}

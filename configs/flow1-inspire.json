@@ -1,0 +1,196 @@
+{
+    "flow_name": "inspire",
+    "description": "Inspire me — I'm not sure where to go yet",
+    "total_questions": 16,
+    "alfie_triggers": [3, 6, 9, 12, 15],
+    "questions": [
+        {
+            "id": "Q0",
+            "text": "Where are you starting from? Helps me know what's realistic.",
+            "type": "free_form",
+            "field": "home_base",
+            "placeholder": "Based in Chicago"
+        },
+        {
+            "id": "Q1",
+            "text": "How far are you open to going?",
+            "type": "single_select",
+            "field": "travel_radius",
+            "options": [
+                "Within driving distance",
+                "Short flight (2–4 hrs)",
+                "Medium flight (5–8 hrs)", 
+                "Long haul — anywhere goes"
+            ]
+        },
+        {
+            "id": "Q2",
+            "text": "Which parts of the world sound most interesting right now?",
+            "type": "multi_select",
+            "field": "regions_interest",
+            "options": [
+                "USA",
+                "Canada",
+                "Europe",
+                "Latin America (incl. Mexico / Central America)",
+                "South America",
+                "Asia",
+                "Africa", 
+                "Middle East",
+                "Open to anywhere"
+            ]
+        },
+        {
+            "id": "Q2a",
+            "text": "Any specific countries, cities, or areas you're leaning toward?",
+            "type": "free_form",
+            "field": "specific_regions",
+            "placeholder": "Portugal, Spain, or Argentina"
+        },
+        {
+            "id": "Q3",
+            "text": "Any places or trip types you definitely don't want me to suggest?",
+            "type": "free_form",
+            "field": "no_go_regions",
+            "placeholder": "No deserts, not into tropical humidity"
+        },
+        {
+            "id": "Q4",
+            "text": "What kinds of terrain sound most appealing?",
+            "type": "multi_select",
+            "field": "terrain_prefs",
+            "options": [
+                "🏔️ Mountains",
+                "🌲 Forest",
+                "🌊 Ocean / Coastline",
+                "🏞️ Lake",
+                "🏖️ Beach",
+                "🏜️ Desert",
+                "❄️ Winter / Snow"
+            ]
+        },
+        {
+            "id": "Q4a",
+            "text": "What kind of setting are you most drawn to?",
+            "type": "single_select",
+            "field": "setting_pref",
+            "options": [
+                "🏙️ Big city",
+                "🏘️ Small town / village",
+                "🌾 Rural countryside",
+                "🏕️ Off the grid / remote",
+                "❓ Open to a mix"
+            ]
+        },
+        {
+            "id": "Q4b",
+            "text": "Do you see this trip as…",
+            "type": "single_select",
+            "field": "trip_structure",
+            "options": [
+                "🏠 Single destination (one home base, can include day trips)",
+                "🧳 Multi-destination (changing locations/lodging)",
+                "🚙 Roadtrip (on the move every day or two)",
+                "❓ Not sure yet — open to ideas"
+            ]
+        },
+        {
+            "id": "Q5",
+            "text": "What's the budget vibe you're picturing?",
+            "type": "single_select",
+            "field": "budget_style",
+            "options": [
+                "💎 Luxe",
+                "✨ Comfortable / Mid-range",
+                "🛶 Budget / Simple",
+                "❓ Not sure yet"
+            ]
+        },
+        {
+            "id": "Q6",
+            "text": "When are you hoping to travel?",
+            "type": "single_select",
+            "field": "season_window",
+            "options": [
+                "❄️ Winter (Dec–Feb)",
+                "🌸 Spring (Mar–May)",
+                "☀️ Summer (Jun–Aug)",
+                "🍂 Fall (Sep–Nov)",
+                "❓ Not sure yet"
+            ]
+        },
+        {
+            "id": "Q7",
+            "text": "How much time do you have?",
+            "type": "single_select", 
+            "field": "trip_length_days",
+            "options": [
+                "Short trip: 2–4 days",
+                "1 week",
+                "2 weeks",
+                "3 weeks"
+            ]
+        },
+        {
+            "id": "Q7a",
+            "text": "What kind of stay are you leaning toward?",
+            "type": "multi_select",
+            "field": "lodging_style",
+            "options": [
+                "🏕️ Camping / Rustic",
+                "🏨 Chain hotel or resort",
+                "🏛️ Boutique / Guesthouse",
+                "🏠 Airbnb / Apartment rental",
+                "🏡 B&B / Farm stay",
+                "🚐 RV / Campervan",
+                "❓ Not sure yet"
+            ]
+        },
+        {
+            "id": "Q7b",
+            "text": "How do you picture getting around?",
+            "type": "single_select",
+            "field": "transport_pref",
+            "options": [
+                "🚆 Trains",
+                "🚗 Rental car / self-drive",
+                "🚌 Public transit",
+                "🚐 Private transfers / guided transport",
+                "❓ Not sure yet — open to suggestions"
+            ]
+        },
+        {
+            "id": "Q8",
+            "text": "Who's going?",
+            "type": "single_select",
+            "field": "party_type",
+            "options": [
+                "👫 Friends",
+                "💑 Couple", 
+                "🧳 Solo",
+                "👨‍👩‍👧‍👦 Family with young kids (under 12)",
+                "👨‍👩‍👦‍👦 Family with kids 12–18",
+                "👵👴 Multi-gen family",
+                "💼 Work trip / Colleagues"
+            ]
+        },
+        {
+            "id": "Q8a",
+            "text": "Tell me the headcount — or the occasion if there's one.",
+            "type": "free_form",
+            "field": "party_details",
+            "placeholder": "6 people, 40th birthday",
+            "conditional": {
+                "field": "party_type",
+                "not_equals": ["💑 Couple", "🧳 Solo"]
+            }
+        },
+        {
+            "id": "Q8b",
+            "text": "How active do you want your days to feel?",
+            "type": "free_form",
+            "field": "activity_ability",
+            "placeholder": "Happy with long hikes most days"
+        }
+    ]
+}
