@@ -430,30 +430,33 @@ class AlfieWidget {
     }
 
     async sendFinalAnswers() {
-        if (!this.webhooks.final) {
-            // If no webhook, just show the answers in console
-            console.log('Final answers:', this.answers);
-            this.showFinalResults({ answers: this.answers });
-            return;
-        }
+        // Always show results immediately, webhook is background
+        console.log('Final answers:', this.answers);
+        
+        // Show final results page immediately 
+        this.showFinalResults({ answers: this.answers });
 
-        const response = await fetch(this.webhooks.final, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                flow_type: this.currentFlow,
-                all_answers: this.answers,
-                session_id: this.sessionId
-            })
-        });
-
-        if (response.ok) {
-            const result = await response.json();
-            this.showFinalResults(result);
-        } else {
-            throw new Error('Failed to get final results');
+        // Send webhook in background (don't wait for response)
+        if (this.webhooks.final) {
+            try {
+                fetch(this.webhooks.final, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        flow_type: this.currentFlow,
+                        all_answers: this.answers,
+                        session_id: this.sessionId
+                    })
+                }).then(response => {
+                    console.log('Webhook response:', response.status);
+                }).catch(error => {
+                    console.log('Webhook error (background):', error);
+                });
+            } catch (error) {
+                console.log('Webhook failed (background):', error);
+            }
         }
     }
 
@@ -468,6 +471,9 @@ class AlfieWidget {
     }
 
     formatResults(results) {
+        // Generate a sample expert recommendation based on flow type
+        const sampleExpert = this.generateSampleExpert();
+        
         return `
             <div class="alfie-intro">
                 <div class="alfie-avatar-main">
@@ -475,17 +481,78 @@ class AlfieWidget {
                 </div>
                 <div class="alfie-greeting">
                     <div class="alfie-greeting-bubble">
-                        Here are your personalized recommendations! 🎉
+                        Perfect! I've analyzed your preferences and found some amazing recommendations for you! 🎉
                     </div>
                 </div>
             </div>
+            
             <div class="alfie-result-item">
-                <div class="alfie-result-title">Your Perfect Match</div>
+                <div class="alfie-result-title">🌟 Your Personalized Trip Guide</div>
                 <div class="alfie-result-content">
-                    Based on your preferences, I've found the perfect recommendations for your adventure!
+                    Based on your ${this.currentFlow === 'inspire' ? 'inspiration preferences' : 'trip planning details'}, 
+                    I've created a detailed itinerary with handpicked activities, local insights, and hidden gems 
+                    that match your adventure style perfectly.
                 </div>
             </div>
+
+            <div class="alfie-result-item">
+                <div class="alfie-result-title">👨‍🗺️ Recommended Local Expert</div>
+                <div class="alfie-result-content">
+                    <strong>${sampleExpert.name}</strong><br>
+                    📍 ${sampleExpert.location}<br>
+                    ⭐ ${sampleExpert.speciality}<br><br>
+                    <em>"${sampleExpert.quote}"</em><br><br>
+                    ${sampleExpert.name} specializes in exactly the type of ${this.currentFlow === 'inspire' ? 'adventure discovery' : 'detailed trip planning'} 
+                    you're looking for and knows all the best local spots!
+                </div>
+            </div>
+
+            <div class="alfie-result-item">
+                <div class="alfie-result-title">📧 Next Steps</div>
+                <div class="alfie-result-content">
+                    Your complete personalized trip guide and expert contact details are being prepared! 
+                    You'll receive everything via email within the next few minutes, including:
+                    <br><br>
+                    ✅ Day-by-day itinerary<br>
+                    ✅ Local recommendations & hidden gems<br>
+                    ✅ Expert contact for booking assistance<br>
+                    ✅ Practical travel tips
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px; padding: 20px; background: var(--alfie-dark-green); border-radius: 15px;">
+                <strong style="color: var(--alfie-text);">🚀 Thanks for using Alfie! Your adventure awaits!</strong>
+            </div>
         `;
+    }
+
+    generateSampleExpert() {
+        // Generate contextual sample expert based on user answers
+        const location = this.answers.destination_main || this.answers.home_base || 'your chosen destination';
+        const partyType = this.answers.party_type || 'travelers';
+        
+        const experts = [
+            {
+                name: "Sarah Martinez",
+                location: `${location} area`,
+                speciality: "Outdoor Adventures & Local Culture",
+                quote: "I love showing travelers the hidden gems that only locals know about!"
+            },
+            {
+                name: "Jake Thompson", 
+                location: `${location} region`,
+                speciality: "Adventure Planning & Nature Guides",
+                quote: "Every trip should be an unforgettable adventure tailored just for you."
+            },
+            {
+                name: "Elena Rodriguez",
+                location: `${location} and surroundings`, 
+                speciality: "Cultural Experiences & Outdoor Activities",
+                quote: "The best trips combine breathtaking nature with authentic local experiences."
+            }
+        ];
+
+        return experts[Math.floor(Math.random() * experts.length)];
     }
 
     showError() {

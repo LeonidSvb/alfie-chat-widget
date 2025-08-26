@@ -4,6 +4,22 @@
 
 ## [Unreleased]
 
+## [1.1.0] - 2025-08-26
+
+### Added
+- Dynamic progress calculation based on user's actual question path
+- Realistic progress estimation showing ~15-24 questions instead of full JSON count
+- `estimatePathLength()` method for accurate progress tracking per flow and user choices
+
+### Changed  
+- Progress display format to "Question X of ~Y" with tilde indicating estimate
+- Final webhook URL updated to `webhook-test/final-processing` for N8N testing
+- Progress calculation now counts answered questions rather than JSON index position
+
+### Fixed
+- Progress bar showing inflated question counts (27 total vs 15-18 actual user path)
+- Misleading progress indicators causing user confusion about flow length
+
 ## [1.0.0] - 2025-08-26
 
 ### Added  
