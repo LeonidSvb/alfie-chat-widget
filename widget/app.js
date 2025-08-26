@@ -115,24 +115,74 @@ class AlfieWidget {
     }
 
     updateProgress() {
-        // Progress with numbers for debugging
-        const flowData = this.getCurrentFlowData();
-        const current = this.currentQuestionIndex + 1;
-        const total = flowData.questions.length;
-        const progressPercentage = (current / total) * 100;
+        // Dynamic progress based on actual user path
+        const answeredCount = Object.keys(this.answers).length;
+        const currentStep = answeredCount + 1;
+        const estimatedTotal = this.estimatePathLength();
+        const progressPercentage = (currentStep / estimatedTotal) * 100;
         
         // Update progress bar
         document.getElementById('progress-bar').style.width = `${Math.min(progressPercentage, 100)}%`;
         
-        // Update progress text with numbers for debugging
+        // Update progress text with dynamic numbers
         const progressEmojis = ['🗣️', '🤔', '✨', '🎯', '🚀'];
-        const emojiIndex = Math.floor((current - 1) / Math.ceil(total / progressEmojis.length));
+        const emojiIndex = Math.floor((currentStep - 1) / Math.ceil(estimatedTotal / progressEmojis.length));
         const emoji = progressEmojis[Math.min(emojiIndex, progressEmojis.length - 1)];
         
         document.getElementById('progress-text').innerHTML = `
             <span class="alfie-progress-emoji">${emoji}</span>
-            <span>Question ${current} of ${total} (${this.currentFlow})</span>
+            <span>Question ${currentStep} of ~${estimatedTotal} (${this.currentFlow})</span>
         `;
+    }
+
+    estimatePathLength() {
+        // Estimate total questions based on current answers and flow type
+        if (this.currentFlow === 'inspire') {
+            // Solo/Couple = 23, Groups = 24
+            const partyType = this.answers.party_type;
+            if (partyType === 'Solo' || partyType === 'Couple') {
+                return 23;
+            } else if (partyType) {
+                return 24;
+            }
+            return 24; // Default to max if not answered yet
+        } 
+        
+        else if (this.currentFlow === 'planning') {
+            let estimate = 11; // Base shared questions (Q1-Q11)
+            
+            // Add trip structure questions
+            const tripStructure = this.answers.trip_structure;
+            if (tripStructure === 'Single destination') {
+                estimate += 2; // Q12A, Q13A
+            } else if (tripStructure === 'Multi-destination') {
+                estimate += 2; // Q12B, Q13B
+            } else if (tripStructure === 'Roadtrip') {
+                estimate += 5; // Q12C-Q16C
+            } else {
+                estimate += 3; // Average if not decided yet
+            }
+            
+            // Add lodging questions
+            const lodgingBooked = this.answers.lodging_booked;
+            if (lodgingBooked === 'No, I need recommendations') {
+                estimate += 2; // Q2b, Q2c
+            }
+            
+            // Add party questions
+            const partyType = this.answers.party_type;
+            if (partyType && partyType !== 'Solo' && partyType !== 'Couple') {
+                estimate += 2; // Q3a, Q3b_group
+            } else if (partyType) {
+                estimate += 1; // Q3b_solo
+            } else {
+                estimate += 1.5; // Average
+            }
+            
+            return Math.round(estimate);
+        }
+        
+        return 20; // Fallback
     }
 
     showQuestion() {

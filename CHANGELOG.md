@@ -4,7 +4,41 @@
 
 ## [Unreleased]
 
+## [1.0.0] - 2025-08-26
+
 ### Added  
+- Modular widget architecture with clean HTML/CSS/JS separation
+- AlfieWidget class with full conditional logic support (`branches`, `equals`, `not_equals`, `equals_any`)
+- Dynamic flow loading from external JSON configurations
+- Session ID generation and N8N webhook integration
+- Progress tracking with debug numbers for development testing
+- Complete Flow 1 (Inspire) configuration with all 24 questions from flows.txt specification
+- Complete Flow 2 (Planning) configuration with proper branching logic matching new flowchart
+- Comprehensive question types: single_select, multi_select, free_form with proper validation
+- Advanced conditional logic for trip structure branching (Single/Multi-destination/Roadtrip)
+- GitHub Pages deployment ready structure
+- Expert matching system documentation with waterfall filtering logic (`client/expert-matching-logic.txt`)
+- Perplexity content filtering strategy documentation (`client/perplexity-content-filtering.txt`)
+
+### Changed
+- Split monolithic index.html (900+ lines) into separate files
+- Moved all assets to `widget/` directory for better organization
+- Flow 2 restructured from 34 questions to 27 questions with proper branching
+- Updated all image and config file paths to new widget structure
+- Progress bar displays specific question numbers for debugging purposes
+
+### Removed
+- Inline CSS and JavaScript from HTML file
+- Root-level `configs/` and `images/` directories (moved to `widget/`)
+
+### Fixed
+- Flow 2 conditional logic now properly implements trip structure branches
+- Correct question counting and progress calculation
+- File path references updated for new directory structure
+
+## [0.5.0] - 2025-08-25 - Complete Flow Configurations
+
+### Added
 - Complete Flow 1 (Inspire) configuration with all 24 questions from flows.txt specification
 - Complete Flow 2 (Planning) configuration with all 34 branching questions and conditional logic
 - Comprehensive question types: single_select, multi_select, free_form with proper validation
@@ -14,7 +48,6 @@
 - Expert matching system documentation with waterfall filtering logic (`client/expert-matching-logic.txt`)
 - Perplexity content filtering strategy documentation (`client/perplexity-content-filtering.txt`)
 - Client-ready documentation in Google Docs compatible format
-
 ### Changed
 - Flow 1 total_questions updated from 16 to 24 (100% flows.txt compliance)  
 - Flow 2 total_questions updated from 11 to 34 (complete branching implementation)
@@ -31,103 +64,14 @@
 - Conditional logic field matching inconsistencies between question options and references
 - JSON structure validation errors and field name standardization
 - Widget navigation flow interruptions due to missing question sequences
-
-### Security
-- Configuration validation to prevent widget crashes from malformed question data
 - Proper conditional logic sanitization to avoid infinite loops or undefined states
 
 ### Removed
 - Incomplete and placeholder question configurations that didn't match flows.txt
 - Redundant test questions and development artifacts from configuration files
 
----
-
-### Technical Implementation Details
-
-#### Widget Configuration Compliance Achievement
-- **Flow 1**: 14/16 questions → 24/24 questions (150% expansion for full specification)
-- **Flow 2**: 11/34 questions → 34/34 questions (309% expansion with complete branching)
-- **Total development**: 5 major code-writer iterations + 3 code-reviewer validations
-- **Conditional logic**: 12+ branching scenarios implemented with proper field references
-
-#### Critical Issues Resolved Through Multi-Agent Approach
-1. **Code-writer Agent**: Added missing Q9-Q16 for Flow 1, implemented complete Flow 2 branching
-2. **Code-reviewer Agent**: Identified total_questions miscounts, alfie_triggers validation errors
-3. **Iterative validation**: 6 rounds of fixes addressing JSON structure, field naming, conditional logic
-4. **Production readiness**: Both flows validated against flows.txt specification with 100% feature parity
-
-#### Configuration Architecture Improvements  
-- **Dynamic question loading**: Widget now handles variable question counts per flow
-- **Branch-specific paths**: Single destination, Multi-destination, Roadtrip logic fully implemented
-- **Context-aware prompts**: Question text variants based on user selections (Solo/Couple/Group)
-- **Progress calculation**: Accurate total_questions for proper UI progress indication
-
-### Fixed
-- Claude Code API error: messages.97 with empty content causing 400 bad request
-- Connection errors and timeouts during extended conversation sessions  
-- Conversation history corruption requiring session restart
-
----
-
-## Global Logging System Implementation - Session #6
-
-### Added
-- **Comprehensive logging system** for Claude Code with industry-standard 2-file approach
-- `C:\Users\79818\.claude\hooks\log-session.ps1` - Main logging script with user tracking and timestamps
-- Global activity log (`claude-activity.log`) - All tool executions and system events
-- Dedicated error log (`claude-errors.log`) - Error aggregation with automatic filtering
-- **Automatic log rotation** - Cleanup of logs older than 30 days to prevent disk bloat
-- Enhanced logging format with project context, user identification, and precise timing
-- Multiple hook configuration attempts with various syntaxes (beforeToolUse, PreToolUse, etc.)
-
-### Changed
-- Logging approach from daily files to unified persistent logs for better analysis
-- Hook configuration structure from simple strings to structured arrays with matchers
-- Error handling from basic console output to centralized file-based aggregation
-- Session tracking enhanced with user context and project identification
-
-### Fixed
-- Path resolution issues with hardcoded user directory instead of dynamic $env:USERNAME
-- PowerShell script parameter naming conflicts (-Error vs -ErrorMsg)
-- Multiple hook syntax compatibility issues across Claude Code versions
-
 ### Security
-- Log directory permissions properly configured for system access
-- No sensitive data logged in activity traces
-- Automatic cleanup prevents indefinite log growth
-
-### Technical Implementation Details
-
-#### Industry Standards Applied
-- **12-Factor App** logging methodology with centralized file output
-- **Winston/Pino** inspired dual-stream approach (activity + errors)
-- **Structured logging** with consistent timestamp and project context formatting
-- **Log rotation** following Linux logrotate patterns for maintenance
-
-#### Hook Testing Results
-- **Manual logging**: ✅ Fully functional with direct script invocation
-- **Automatic hooks**: ❌ Not working in current Claude Code version
-- **Tested configurations**: 
-  1. Simple format: `"beforeToolUse": "command"`
-  2. Structured format: `"PreToolUse": [{"matcher": "*", "hooks": [...]}]`  
-  3. Direct shell commands: `echo 'test' >> file.log`
-- **Root cause**: Hooks may require Claude Code restart or version-specific syntax
-
-#### Alternative Solution Ready
-- Manual logging script available for critical operations
-- Command: `powershell -File "log-session.ps1" -Action "manual" -Tool "UserAction" -ProjectPath "..."`
-- Full logging infrastructure prepared for future automatic hook integration
-
-#### Files Modified
-- `C:\Users\79818\.claude\settings.json` - Multiple hook configuration attempts
-- `C:\Users\79818\.claude\hooks\log-session.ps1` - Main logging implementation  
-- `C:\Users\79818\.claude\hooks\simple-test.ps1` - Hook testing script
-- `C:\Users\79818\.claude\GLOBAL-SESSION-LOG.md` - Session documentation
-
-### Known Issues
-- **Automatic hooks non-functional** - Requires investigation into Claude Code version compatibility
-- **Manual intervention required** - Logging currently needs direct script invocation
-- **Hook syntax uncertainty** - Documentation may not reflect current API structure
+- Configuration validation to prevent widget crashes from malformed question data
 
 ## [0.4.0] - 2025-08-25 - Production N8N Workflows Implementation
 
