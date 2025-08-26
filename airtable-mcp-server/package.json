@@ -1,0 +1,18 @@
+{
+  "name": "airtable-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP Server for Airtable integration with Outdoorable expert matching",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --inspect index.js"
+  },
+  "dependencies": {
+    "@airtable/blocks": "^1.0.0",
+    "airtable": "^0.12.2"
+  },
+  "keywords": ["mcp", "airtable", "outdoorable"],
+  "author": "Outdoorable Team",
+  "license": "ISC"
+}

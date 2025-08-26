@@ -61,23 +61,35 @@
 
 ## Architecture & Process Flow
 
-**Real Conversation Flow:**
-1. **Client** → asks questions through chat widget
-2. **OpenAI** → every 2-3 questions reformulates & maintains Alfie personality 
-3. **End of conversation** → trigger final processing:
-   - **Perplexity** → Google search with site filtering
-   - **OpenAI** → generates recommendations from search results  
-   - **Airtable** → expert matching by region/specialization
-4. **Output** → recommendations + matched expert + booking link
+**UPDATED PRODUCT UNDERSTANDING (Aug 26):**
+- This is a **trip planning tool**, NOT a traditional chatbot
+- Users complete extensive questionnaire (30+ questions) to get detailed trip guide
+- Format: structured data collection → comprehensive output → clear endpoint
+- Monetization: email capture for full guide, then expert consultation booking
+
+**Real Process Flow:**
+1. **User Input Phase** → completes all questions in conversation flows
+2. **Alfie Interjections** → strategic responses at key points (not every 2-3 questions)
+3. **Research Phase** → Perplexity search with site filtering + prompt optimization
+4. **Output Generation** → OpenAI formats comprehensive trip guide (day-by-day, specific to their inputs)
+5. **Expert Matching** → Airtable integration by region/specialization
+6. **Deliverable** → formatted trip guide + expert contact + booking option
 
 **N8N Cloud orchestrates everything. You can edit workflows directly via MCP.**
 
 ## Project Context
 
 **What this is:**
-- Travel MVP: AI chat widget connecting travelers to outdoor experts  
-- 2 conversation flows: destination inspiration (16 questions) vs trip planning (11 questions)
-- End goal: match users with real human experts for booking
+- Travel MVP: Trip planning tool that collects detailed user preferences
+- 2 conversation flows: destination inspiration vs trip planning (both with 15-30+ questions)
+- Output: Comprehensive, personalized outdoor trip guide (not just recommendations)
+- End goal: qualified leads for expert consultations with pre-collected trip details
+
+**Current Development Priorities:**
+1. Complete question flow logic and branching
+2. Optimize Perplexity search prompts and result filtering  
+3. Create output formatting prompts for trip guide generation
+4. Airtable expert matching integration
 
 **Alfie personality and conversation flows are implemented in N8N workflow prompts, not here.**
 

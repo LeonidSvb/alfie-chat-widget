@@ -1,8 +1,8 @@
 {
     "flow_name": "inspire",
     "description": "Inspire me — I'm not sure where to go yet",
-    "total_questions": 16,
-    "alfie_triggers": [3, 6, 9, 12, 15],
+    "total_questions": 24,
+    "alfie_triggers": [4, 8, 12, 16],
     "questions": [
         {
             "id": "Q0",
@@ -128,7 +128,8 @@
                 "Short trip: 2–4 days",
                 "1 week",
                 "2 weeks",
-                "3 weeks"
+                "3 weeks",
+                "3 weeks+"
             ]
         },
         {
@@ -188,9 +189,117 @@
         {
             "id": "Q8b",
             "text": "How active do you want your days to feel?",
+            "text_variants": {
+                "🧳 Solo": "How active do you want your days to feel?",
+                "💑 Couple": "What's your energy level together on trips?",
+                "default": "How active is the crew overall?"
+            },
             "type": "free_form",
             "field": "activity_ability",
-            "placeholder": "Happy with long hikes most days"
+            "placeholder": "Happy with long hikes most days",
+            "placeholder_variants": {
+                "🧳 Solo": "Happy with long hikes most days",
+                "💑 Couple": "We like a mix — one big day, one relaxed day",
+                "default": "Most can hike 3–5 miles, one prefers scenic drives"
+            },
+            "conditional_text": {
+                "field": "party_type"
+            }
+        },
+        {
+            "id": "Q9",
+            "text": "How active do you want this trip to feel?",
+            "type": "single_select",
+            "field": "fitness_level",
+            "options": [
+                "Low-key (short walks, light activity)",
+                "Moderate (day hikes, biking, city walking)",
+                "High (long hikes, skiing, multi-day treks)"
+            ]
+        },
+        {
+            "id": "Q10",
+            "text": "Set the mix — nature vs culture.",
+            "type": "single_select",
+            "field": "balance_ratio",
+            "options": [
+                "70% Outdoors / 30% Culture",
+                "50% Outdoors / 50% Culture",
+                "30% Outdoors / 70% Culture"
+            ]
+        },
+        {
+            "id": "Q11",
+            "text": "Which outdoor activities are most important to you?",
+            "type": "multi_select",
+            "field": "outdoor_activities",
+            "options": [
+                "Hiking",
+                "Biking",
+                "Beaches & swimming",
+                "Surfing",
+                "Water activities (kayak, paddle, snorkel)",
+                "Skiing / Snowboarding",
+                "Scenic drives",
+                "Wildlife viewing",
+                "Family-friendly outdoor activities",
+                "Other… (free form)"
+            ]
+        },
+        {
+            "id": "Q12",
+            "text": "What about cultural or non-outdoorsy interests?",
+            "type": "multi_select",
+            "field": "non_outdoor_interests",
+            "options": [
+                "Historic & archaeological sites",
+                "Art & museums",
+                "Live music / Nightlife",
+                "Markets",
+                "Spa / Wellness",
+                "Food experiences (cooking classes, food tours, wine/beer tastings)"
+            ]
+        },
+        {
+            "id": "Q13",
+            "text": "Are you interested in guided experiences, or would you rather explore fully on your own?",
+            "type": "multi_select",
+            "field": "guided_experiences",
+            "options": [
+                "Guided outdoor activities (hikes, climbs, paddles)",
+                "Guided day trips",
+                "Guided city/cultural tours",
+                "Food/wine tours, cooking classes",
+                "🚫 No thanks — fully independent"
+            ]
+        },
+        {
+            "id": "Q14",
+            "text": "What kind of food experiences are you into?",
+            "type": "multi_select",
+            "field": "food_prefs",
+            "options": [
+                "Adventurous eats",
+                "Super local / traditional spots",
+                "Fine dining",
+                "Cooking classes",
+                "Food tours",
+                "Markets"
+            ]
+        },
+        {
+            "id": "Q15",
+            "text": "What should I skip suggesting? Crowds, long drives, extreme heat…?",
+            "type": "free_form",
+            "field": "dealbreakers",
+            "placeholder": "No overnight buses, avoid humid destinations"
+        },
+        {
+            "id": "Q16",
+            "text": "Last one — tell me how you want this trip to feel.",
+            "type": "free_form",
+            "field": "trip_feel",
+            "placeholder": "Relaxed with a few big active days"
         }
     ]
 }
