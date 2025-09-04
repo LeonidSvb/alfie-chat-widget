@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outdoorable Chat Widget</title>
+    <style>
+        /* Inline CSS for Webflow compatibility */
+        :root {
+            --alfie-green: #4A8B5C;
+            --alfie-light-green: #E8F5E8;
+            --alfie-dark-green: #D4EDD4;
+            --alfie-orange: #FF8C42;
+            --alfie-text: #2E4B3E;
+            --alfie-text-light: #4A6741;
+        }
+
+        .alfie-embedded-chat {
+            width: 100%;
+            max-width: 500px;
+            background: var(--alfie-light-green);
+            border-radius: 20px;
+            padding: 30px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            box-sizing: border-box;
+            margin: 0 auto;
+        }
+
+        .alfie-hidden { display: none; }
+
+        .alfie-progress-container {
+            width: 100%;
+            margin-bottom: 25px;
+        }
+
+        .alfie-progress-text {
+            font-size: 14px;
+            color: var(--alfie-text);
+            text-align: center;
+            margin-bottom: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .alfie-progress-track {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .alfie-progress-bar {
+            height: 100%;
+            background: var(--alfie-green);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .alfie-intro {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .alfie-avatar-main img, .alfie-avatar img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+
+        .alfie-greeting-bubble {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            color: var(--alfie-text);
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .alfie-flow-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .alfie-flow-button {
+            background: var(--alfie-green);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .alfie-flow-button:hover {
+            background: #3A7A4C;
+            transform: translateY(-2px);
+        }
+
+        .alfie-question-display {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .alfie-question-text {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            color: var(--alfie-text);
+            font-size: 16px;
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        .alfie-answer-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .alfie-answer-button {
+            background: white;
+            border: 2px solid #E0E0E0;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            color: var(--alfie-text);
+        }
+
+        .alfie-answer-button:hover {
+            border-color: var(--alfie-green);
+            background: #f8fff8;
+        }
+
+        .alfie-answer-button.selected {
+            background: var(--alfie-green);
+            color: white;
+            border-color: var(--alfie-green);
+        }
+
+        .alfie-custom-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .alfie-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #E0E0E0;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .alfie-input:focus {
+            border-color: var(--alfie-green);
+        }
+
+        .alfie-submit-button {
+            background: var(--alfie-green);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .alfie-loading-section {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .alfie-loading-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .alfie-loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--alfie-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alfie-final-results {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="alfie-widget" class="alfie-widget">
+        <div class="alfie-embedded-chat">
+            
+            <!-- Progress Bar -->
+            <div class="alfie-progress-container" id="progress-container" style="display: none;">
+                <div class="alfie-progress-text" id="progress-text">
+                    <span class="alfie-progress-emoji">🗣️</span>
+                    <span>Getting started...</span>
+                </div>
+                <div class="alfie-progress-track">
+                    <div class="alfie-progress-bar" id="progress-bar"></div>
+                </div>
+            </div>
+            
+            <!-- Alfie Introduction & Flow Selection -->
+            <div id="flow-selection" class="alfie-flow-selection">
+                <div class="alfie-intro">
+                    <div class="alfie-avatar-main">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Ccircle cx='30' cy='30' r='30' fill='%234A8B5C'/%3E%3Ctext x='30' y='38' text-anchor='middle' fill='white' font-size='24'%3E🏔️%3C/text%3E%3C/svg%3E" alt="Alfie" />
+                    </div>
+                    <div class="alfie-greeting">
+                        <div class="alfie-greeting-bubble">
+                            Hi, I'm Alfie 👋 Tell me what you're dreaming up and I'll share free tailored trip ideas to inspire your next adventure.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alfie-flow-buttons">
+                    <button class="alfie-flow-button" data-flow="inspire">
+                        💡 Inspire me — I'm not sure where to go yet
+                        <span class="alfie-flow-arrow">→</span>
+                    </button>
+                    <button class="alfie-flow-button" data-flow="planning">
+                        🗺️ I know my destination — help with recs & itinerary
+                        <span class="alfie-flow-arrow">→</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Questions Section -->
+            <div id="questions-section" class="alfie-questions-section alfie-hidden">
+                <div class="alfie-question-display">
+                    <div class="alfie-avatar">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Ccircle cx='30' cy='30' r='30' fill='%234A8B5C'/%3E%3Ctext x='30' y='38' text-anchor='middle' fill='white' font-size='24'%3E🏔️%3C/text%3E%3C/svg%3E" alt="Alfie" />
+                    </div>
+                    <div id="current-question" class="alfie-question-text">
+                        <!-- Dynamic question text -->
+                    </div>
+                </div>
+                
+                <div id="answer-options" class="alfie-answer-options">
+                    <!-- Dynamic answer options -->
+                </div>
+                
+                <!-- Custom Text Input -->
+                <div class="alfie-custom-input" id="custom-input" style="display: none;">
+                    <input type="text" id="custom-answer-field" class="alfie-input" placeholder="Type your answer here..." />
+                    <button class="alfie-submit-button" id="submit-custom">Submit</button>
+                </div>
+            </div>
+            
+            <!-- Loading State -->
+            <div id="loading-section" class="alfie-loading-section alfie-hidden">
+                <div class="alfie-loading-content">
+                    <div class="alfie-avatar">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Ccircle cx='30' cy='30' r='30' fill='%234A8B5C'/%3E%3Ctext x='30' y='38' text-anchor='middle' fill='white' font-size='24'%3E🏔️%3C/text%3E%3C/svg%3E" alt="Alfie" />
+                    </div>
+                    <div class="alfie-loading-text">
+                        <h3>Generating your TripGuide...</h3>
+                        <p>Perfect! I'm analyzing your preferences and preparing personalized recommendations</p>
+                        <div class="alfie-loading-spinner"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Final Results -->
+            <div id="results-section"="alfie-final-results alfie-hidden">
+                <!-- Dynamic results content will be inserted here -->
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        // Embedded Questions Data
+        const QUESTIONS_DATA = {
+            inspire: [
+                {
+                    id: "Q1",
+                    question: "What type of outdoor experience calls to you?",
+                    type: "single",
+                    options: [
+                        "🏔️ Mountains & hiking",
+                        "🏖️ Coastal & water activities", 
+                        "🌲 Forests & wilderness",
+                        "🏜️ Desert adventures",
+                        "🏙️ Urban outdoor spaces"
+                    ]
+                },
+                {
+                    id: "Q2", 
+                    question: "How adventurous are you feeling?",
+                    type: "single",
+                    options: [
+                        "🌟 Push my limits - I want to be challenged",
+                        "⚖️ Balanced mix of adventure and relaxation", 
+                        "😌 Gentle exploration - keep it accessible"
+                    ]
+                }
+            ],
+            planning: [
+                {
+                    id: "Q1",
+                    question: "Where are you planning to go?",
+                    type: "text",
+                    placeholder: "e.g., Yosemite National Park, Costa Rica, Nepal..."
+                },
+                {
+                    id: "Q2",
+                    question: "What's your main activity focus?",
+                    type: "single", 
+                    options: [
+                        "🥾 Hiking & trekking",
+                        "🏂 Winter sports",
+                        "🚴 Cycling & biking",
+                        "🏄 Water sports",
+                        "🧗 Climbing & mountaineering"
+                    ]
+                }
+            ]
+        };
+
+        // Main Widget Logic
+        class OutdoorableWidget {
+            constructor() {
+                this.currentFlow = null;
+                this.currentQuestionIndex = 0;
+                this.answers = {};
+                this.filteredQuestions = [];
+                this.webhook_url = 'https://leonidshvorob.app.n8n.cloud/webhook/final-processing';
+                
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.showStartScreen();
+            }
+
+            bindEvents() {
+                // Flow selection buttons
+                const flowButtons = document.querySelectorAll('.alfie-flow-button');
+                flowButtons.forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const flow = e.target.dataset.flow;
+                        this.startFlow(flow);
+                    });
+                });
+
+                // Custom input submit
+                const submitButton = document.getElementById('submit-custom');
+                if (submitButton) {
+                    submitButton.addEventListener('click', () => {
+                        const input = document.getElementById('custom-answer-field');
+                        if (input && input.value.trim()) {
+                            this.handleAnswer(input.value.trim());
+                            input.value = '';
+                        }
+                    });
+                }
+            }
+
+            showStartScreen() {
+                this.hideAllSections();
+                document.getElementById('flow-selection').style.display = 'block';
+            }
+
+            hideAllSections() {
+                const sections = [
+                    'flow-selection',
+                    'questions-section', 
+                    'loading-section',
+                    'results-section',
+                    'progress-container'
+                ];
+                
+                sections.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.style.display = 'none';
+                    }
+                });
+            }
+
+            startFlow(flow) {
+                this.currentFlow = flow;
+                this.currentQuestionIndex = 0;
+                this.answers = {};
+                this.filteredQuestions = QUESTIONS_DATA[flow] || [];
+                
+                this.showProgressBar();
+                this.showNextQuestion();
+            }
+
+            showProgressBar() {
+                document.getElementById('progress-container').style.display = 'block';
+                this.updateProgress();
+            }
+
+            updateProgress() {
+                const progress = ((this.currentQuestionIndex + 1) / this.filteredQuestions.length) * 100;
+                const progressBar = document.getElementById('progress-bar');
+                const progressText = document.getElementById('progress-text');
+                
+                if (progressBar) {
+                    progressBar.style.width = progress + '%';
+                }
+                
+                if (progressText) {
+                    const questionNum = this.currentQuestionIndex + 1;
+                    const totalQuestions = this.filteredQuestions.length;
+                    progressText.innerHTML = `
+                        <span class="alfie-progress-emoji">💬</span>
+                        <span>Question ${questionNum} of ${totalQuestions}</span>
+                    `;
+                }
+            }
+
+            showNextQuestion() {
+                if (this.currentQuestionIndex >= this.filteredQuestions.length) {
+                    this.processAnswers();
+                    return;
+                }
+
+                this.hideAllSections();
+                document.getElementById('questions-section').style.display = 'block';
+                document.getElementById('progress-container').style.display = 'block';
+
+                const question = this.filteredQuestions[this.currentQuestionIndex];
+                this.displayQuestion(question);
+                this.updateProgress();
+            }
+
+            displayQuestion(question) {
+                const questionElement = document.getElementById('current-question');
+                const optionsElement = document.getElementById('answer-options');
+                const customInputElement = document.getElementById('custom-input');
+
+                if (questionElement) {
+                    questionElement.textContent = question.question;
+                }
+
+                // Clear previous options
+                if (optionsElement) {
+                    optionsElement.innerHTML = '';
+                }
+
+                if (question.type === 'text') {
+                    // Show text input
+                    if (customInputElement) {
+                        customInputElement.style.display = 'flex';
+                        const input = document.getElementById('custom-answer-field');
+                        if (input) {
+                            input.placeholder = question.placeholder || 'Type your answer here...';
+                            input.focus();
+                        }
+                    }
+                    if (optionsElement) {
+                        optionsElement.style.display = 'none';
+                    }
+                } else {
+                    // Show multiple choice options
+                    if (customInputElement) {
+                        customInputElement.style.display = 'none';
+                    }
+                    if (optionsElement) {
+                        optionsElement.style.display = 'flex';
+                        
+                        question.options.forEach(option => {
+                            const button = document.createElement('button');
+                            button.className = 'alfie-answer-button';
+                            button.textContent = option;
+                            button.addEventListener('click', () => {
+                                this.handleAnswer(option);
+                            });
+                            optionsElement.appendChild(button);
+                        });
+                    }
+                }
+            }
+
+            handleAnswer(answer) {
+                const question = this.filteredQuestions[this.currentQuestionIndex];
+                this.answers[question.id] = answer;
+                
+                this.currentQuestionIndex++;
+                this.showNextQuestion();
+            }
+
+            processAnswers() {
+                this.showLoading();
+                
+                const payload = {
+                    flow: this.currentFlow,
+                    answers: this.answers,
+                    timestamp: new Date().toISOString()
+                };
+
+                // Simulate processing for demo
+                setTimeout(() => {
+                    this.showResults({
+                        success: true,
+                        message: "Thanks for trying the Outdoorable demo! Your personalized trip guide would appear here.",
+                        tripGuide: "This is where your detailed itinerary and recommendations would be generated based on your answers."
+                    });
+                }, 3000);
+
+                // Uncomment for real webhook integration:
+                /*
+                fetch(this.webhook_url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    this.showResults(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    this.showError();
+                });
+                */
+            }
+
+            showLoading() {
+                this.hideAllSections();
+                document.getElementById('loading-section').style.display = 'block';
+            }
+
+            showResults(data) {
+                this.hideAllSections();
+                const resultsSection = document.getElementById('results-section');
+                if (resultsSection) {
+                    resultsSection.style.display = 'block';
+                    resultsSection.className = 'alfie-final-results';
+                    resultsSection.innerHTML = `
+                        <h2>Your Personalized Trip Guide</h2>
+                        <p>${data.message}</p>
+                        <div style="margin-top: 20px; padding: 15px; background: #f0f8f0; border-radius: 10px;">
+                            <p>${data.tripGuide}</p>
+                        </div>
+                        <div style="margin-top: 20px; text-align: center;">
+                            <button class="alfie-flow-button" onclick="location.reload()">
+                                Start New Trip Planning
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+
+            showError() {
+                this.hideAllSections();
+                const resultsSection = document.getElementById('results-section');
+                if (resultsSection) {
+                    resultsSection.style.display = 'block';
+                    resultsSection.className = 'alfie-final-results';
+                    resultsSection.innerHTML = `
+                        <h2>Something went wrong</h2>
+                        <p>We're having trouble processing your request. Please try again.</p>
+                        <button class="alfie-flow-button" onclick="location.reload()">
+                            Try Again
+                        </button>
+                    `;
+                }
+            }
+        }
+
+        // Initialize the widget when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            new OutdoorableWidget();
+        });
+    </script>
+</body>
+</html>

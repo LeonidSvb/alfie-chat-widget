@@ -1,0 +1,425 @@
+{
+  "name": "Outdoorable Final Processing - IMPROVED",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "final-processing",
+        "options": {}
+      },
+      "id": "webhook-final",
+      "name": "Final Processing Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        16,
+        64
+      ],
+      "webhookId": "6b3cc390-f6f0-4693-a068-be8a1dc397a4"
+    },
+    {
+      "parameters": {
+        "jsCode": "// УЛУЧШЕННАЯ СИСТЕМА ПОИСКА ЭКСПЕРТОВ\n// Интегрированная версия improved_filtering_logic.js для N8N\n\nconst AIRTABLE_API_KEY = 'patt4GHq4ij1rNAdK.9b230d9e4002e265f7a89f6e208fd0d3145d1f495d66eb092252b8da7559da9d';\nconst NEW_BASE_ID = 'apptAJxE6IudBH8fW';\nconst NEW_TABLE_ID = 'tblgvgDuQm20rNVPV';\n\nclass ImprovedExpertMatcher {\n  constructor() {\n    this.experts = [];\n  }\n\n  async getAllExperts() {\n    let allRecords = [];\n    let offset = null;\n\n    do {\n      const url = `https://api.airtable.com/v0/${NEW_BASE_ID}/${NEW_TABLE_ID}${offset ? `?offset=${offset}` : ''}`;\n      \n      const response = await fetch(url, {\n        headers: {\n          'Authorization': `Bearer ${AIRTABLE_API_KEY}`\n        }\n      });\n\n      if (!response.ok) {\n        throw new Error(`Airtable API error: ${response.status}`);\n      }\n\n      const data = await response.json();\n      allRecords = allRecords.concat(data.records);\n      offset = data.offset;\n\n    } while (offset);\n\n    this.experts = allRecords.filter(record => record.fields.Name);\n    return this.experts;\n  }\n\n  findExperts(userRequest) {\n    const {\n      destination,\n      specific_location,\n      activities,\n      traveler_type,\n      experience_level,\n      languages\n    } = userRequest;\n\n    console.log('🔍 ПОИСК ЭКСПЕРТОВ ПО ЗАПРОСУ:', userRequest);\n\n    let candidates = [...this.experts];\n    const filterSteps = [];\n\n    // ГЕОГРАФИЯ\n    if (destination || specific_location) {\n      const locationFilters = [];\n      \n      if (destination) locationFilters.push(this.createLocationFilter(destination));\n      if (specific_location) locationFilters.push(this.createLocationFilter(specific_location));\n\n      candidates = candidates.filter(expert => {\n        return locationFilters.some(filter => this.matchesLocationFilter(expert, filter));\n      });\n\n      filterSteps.push({\n        step: 'География',\n        criteria: `${destination || ''} ${specific_location || ''}`.trim(),\n        remaining: candidates.length\n      });\n    }\n\n    // АКТИВНОСТИ\n    if (activities && activities.length > 0) {\n      candidates = candidates.filter(expert => {\n        return activities.some(activity => this.matchesActivity(expert, activity));\n      });\n\n      filterSteps.push({\n        step: 'Активности',\n        criteria: activities.join(', '),\n        remaining: candidates.length\n      });\n    }\n\n    // ТИП ПУТЕШЕСТВЕННИКА\n    if (traveler_type) {\n      candidates = candidates.filter(expert => {\n        return this.matchesTravelerType(expert, traveler_type);\n      });\n\n      filterSteps.push({\n        step: 'Тип путешественника',\n        criteria: traveler_type,\n        remaining: candidates.length\n      });\n    }\n\n    // УРОВЕНЬ ОПЫТА\n    if (experience_level) {\n      candidates = candidates.filter(expert => {\n        return this.matchesExperienceLevel(expert, experience_level);\n      });\n\n      filterSteps.push({\n        step: 'Уровень опыта',\n        criteria: experience_level,\n        remaining: candidates.length\n      });\n    }\n\n    // ЯЗЫКИ\n    if (languages && languages.length > 0) {\n      candidates = candidates.filter(expert => {\n        return languages.some(lang => this.matchesLanguage(expert, lang));\n      });\n\n      filterSteps.push({\n        step: 'Языки',\n        criteria: languages.join(', '),\n        remaining: candidates.length\n      });\n    }\n\n    // РАНЖИРОВАНИЕ\n    const rankedResults = this.rankExperts(candidates, userRequest);\n\n    return {\n      totalFound: rankedResults.length,\n      experts: rankedResults.slice(0, 5), // Топ 5 экспертов\n      filterSteps: filterSteps\n    };\n  }\n\n  createLocationFilter(location) {\n    const synonyms = {\n      'thailand': ['country_thailand', 'thai'],\n      'bangkok': ['dest_bangkok', 'country_thailand'],\n      'chiang mai': ['dest_chiang_mai', 'country_thailand'],\n      'krabi': ['dest_krabi', 'country_thailand'],\n      'koh lanta': ['dest_koh_lanta', 'country_thailand'],\n      'utah': ['region_utah', 'country_us'],\n      'colorado': ['region_colorado', 'country_us'],\n      'norway': ['country_norway'],\n      'patagonia': ['dest_patagonia']\n    };\n\n    const locationLower = location.toLowerCase();\n    return synonyms[locationLower] || [locationLower];\n  }\n\n  matchesLocationFilter(expert, filter) {\n    const locationTags = expert.fields.Location_Tags || [];\n    const allTags = expert.fields.All_Tags || [];\n    \n    return filter.some(term => {\n      return locationTags.some(tag => tag.toLowerCase().includes(term.toLowerCase())) ||\n             allTags.some(tag => tag.toLowerCase().includes(term.toLowerCase())) ||\n             this.textContains(expert.fields.Geographic_areas_raw, term);\n    });\n  }\n\n  matchesActivity(expert, activity) {\n    const activitySynonyms = {\n      'hiking': ['activity_hiking', 'hiking', 'backpacking'],\n      'walking tours': ['activity_walking', 'walking', 'city tours'],\n      'water activities': ['activity_diving', 'activity_kayaking', 'snorkel', 'water'],\n      'snorkel': ['activity_diving', 'snorkel', 'water'],\n      'kayak': ['activity_kayaking', 'kayak', 'water'],\n      'art': ['activity_cultural', 'art', 'museums'],\n      'museums': ['activity_cultural', 'museums', 'culture'],\n      'food tours': ['activity_culinary', 'food', 'culinary']\n    };\n\n    const activityLower = activity.toLowerCase();\n    const synonymsToCheck = activitySynonyms[activityLower] || [activityLower];\n\n    const activityTags = expert.fields.Activity_Tags || [];\n    const allTags = expert.fields.All_Tags || [];\n\n    return synonymsToCheck.some(term => {\n      return activityTags.some(tag => tag.toLowerCase().includes(term.toLowerCase())) ||\n             allTags.some(tag => tag.toLowerCase().includes(term.toLowerCase())) ||\n             this.textContains(expert.fields.Professional_expertise_raw, term);\n    });\n  }\n\n  matchesTravelerType(expert, type) {\n    const typeSynonyms = {\n      'solo': ['traveler_solo', 'solo', 'independent'],\n      'couple': ['traveler_couples', 'couple', 'romantic'],\n      'families': ['traveler_families', 'family', 'kids'],\n      'groups': ['traveler_groups', 'group']\n    };\n\n    const typeLower = type.toLowerCase();\n    const synonymsToCheck = typeSynonyms[typeLower] || [typeLower];\n\n    const travelerTags = expert.fields.Traveler_Tags || [];\n    const allTags = expert.fields.All_Tags || [];\n\n    return synonymsToCheck.some(term => {\n      return travelerTags.some(tag => tag.toLowerCase().includes(term.toLowerCase())) ||\n             allTags.some(tag => tag.toLowerCase().includes(term.toLowerCase())) ||\n             this.textContains(expert.fields.Travel_types_experience, term);\n    });\n  }\n\n  matchesExperienceLevel(expert, level) {\n    const levelSynonyms = {\n      'moderate': ['level_beginner', 'level_intermediate', 'moderate'],\n      'beginner': ['level_beginner', 'beginner', 'first-time'],\n      'advanced': ['level_advanced', 'advanced', 'experienced'],\n      'active explorer': ['level_advanced', 'active', 'explorer']\n    };\n\n    const levelLower = level.toLowerCase();\n    const synonymsToCheck = levelSynonyms[levelLower] || [levelLower];\n\n    const expertiseTags = expert.fields.Expertise_Tags || [];\n    const allTags = expert.fields.All_Tags || [];\n\n    return synonymsToCheck.some(term => {\n      return expertiseTags.some(tag => tag.toLowerCase().includes(term.toLowerCase())) ||\n             allTags.some(tag => tag.toLowerCase().includes(term.toLowerCase()));\n    });\n  }\n\n  matchesLanguage(expert, language) {\n    const languageTags = expert.fields.Language_Tags || [];\n    const allTags = expert.fields.All_Tags || [];\n\n    return languageTags.some(tag => tag.toLowerCase().includes(language.toLowerCase())) ||\n           allTags.some(tag => tag.toLowerCase().includes(language.toLowerCase())) ||\n           this.textContains(expert.fields.Languages_raw, language);\n  }\n\n  rankExperts(experts, userRequest) {\n    return experts.map(expert => {\n      const score = this.calculateRelevanceScore(expert, userRequest);\n      return {\n        expert: expert,\n        score: score,\n        reasons: this.explainMatch(expert, userRequest)\n      };\n    }).sort((a, b) => b.score - a.score);\n  }\n\n  calculateRelevanceScore(expert, userRequest) {\n    let score = 0;\n\n    if (userRequest.destination && this.matchesLocationFilter(expert, this.createLocationFilter(userRequest.destination))) {\n      score += 10;\n    }\n\n    if (userRequest.activities) {\n      userRequest.activities.forEach(activity => {\n        if (this.matchesActivity(expert, activity)) score += 8;\n      });\n    }\n\n    if (userRequest.traveler_type && this.matchesTravelerType(expert, userRequest.traveler_type)) {\n      score += 6;\n    }\n\n    if (userRequest.experience_level && this.matchesExperienceLevel(expert, userRequest.experience_level)) {\n      score += 5;\n    }\n\n    return score;\n  }\n\n  explainMatch(expert, userRequest) {\n    const reasons = [];\n    \n    if (userRequest.destination && this.matchesLocationFilter(expert, this.createLocationFilter(userRequest.destination))) {\n      reasons.push(`Expert in: ${userRequest.destination}`);\n    }\n\n    if (userRequest.activities) {\n      userRequest.activities.forEach(activity => {\n        if (this.matchesActivity(expert, activity)) {\n          reasons.push(`Specializes in: ${activity}`);\n        }\n      });\n    }\n\n    if (userRequest.traveler_type && this.matchesTravelerType(expert, userRequest.traveler_type)) {\n      reasons.push(`Experience with: ${userRequest.traveler_type}`);\n    }\n\n    return reasons;\n  }\n\n  textContains(text, term) {\n    if (!text || !term) return false;\n    return text.toLowerCase().includes(term.toLowerCase());\n  }\n}\n\n// ГЛАВНАЯ ФУНКЦИЯ ДЛЯ N8N\nasync function findMatchingExperts() {\n  const userTrip = $input.first().json;\n  \n  // Парсим пользовательские данные\n  const searchRequest = {\n    destination: extractDestination(userTrip),\n    specific_location: extractSpecificLocation(userTrip),\n    activities: extractActivities(userTrip),\n    traveler_type: extractTravelerType(userTrip),\n    experience_level: extractExperienceLevel(userTrip)\n  };\n\n  console.log('🎯 Extracted search parameters:', searchRequest);\n\n  // Создаем matcher и ищем экспертов\n  const matcher = new ImprovedExpertMatcher();\n  await matcher.getAllExperts();\n  \n  const results = matcher.findExperts(searchRequest);\n  \n  console.log(`✅ Found ${results.totalFound} matching experts`);\n  \n  // Возвращаем в формате, ожидаемом следующими нодами\n  return results.experts.map(result => ({\n    json: {\n      id: result.expert.id,\n      fields: {\n        ...result.expert.fields,\n        relevance_score: result.score,\n        match_reasons: result.reasons.join(', '),\n        why_recommended: result.reasons\n      }\n    }\n  }));\n}\n\n// ФУНКЦИИ ИЗВЛЕЧЕНИЯ ПАРАМЕТРОВ\nfunction extractDestination(trip) {\n  // Из stops или других полей\n  const stops = trip.branch_multi_destination?.stops || [];\n  if (stops.length > 0) {\n    const mainStop = stops[0].name;\n    // Определяем страну по городу\n    const cityToCountry = {\n      'Bangkok': 'Thailand',\n      'Chiang Mai': 'Thailand', \n      'Krabi': 'Thailand',\n      'Koh Lanta': 'Thailand'\n    };\n    return cityToCountry[mainStop] || mainStop;\n  }\n  return null;\n}\n\nfunction extractSpecificLocation(trip) {\n  const stops = trip.branch_multi_destination?.stops || [];\n  return stops.map(stop => stop.name).join(', ');\n}\n\nfunction extractActivities(trip) {\n  const activities = trip.activities || [];\n  return activities.map(activity => {\n    // Убираем эмодзи и очищаем\n    return activity.replace(/🥾|🚶|🌊|🎨|🍷/g, '').trim();\n  });\n}\n\nfunction extractTravelerType(trip) {\n  return trip.party_type?.toLowerCase() || 'general';\n}\n\nfunction extractExperienceLevel(trip) {\n  return trip.travel_style?.toLowerCase() || trip.fitness_level?.toLowerCase() || 'moderate';\n}\n\n// Запускаем поиск экспертов\nreturn await findMatchingExperts();"
+      },
+      "id": "smart-expert-finder",
+      "name": "Smart Expert Finder",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {\"success\": true, \"recommendations\": $('Generate Final Recommendations').first().json.choices[0].message.content, \"destinations\": JSON.parse($('Analyze Travel Preferences').first().json.choices[0].message.content), \"experts\": $('Smart Expert Finder').all(), \"timestamp\": $now.toISOString()} }}",
+        "options": {}
+      },
+      "id": "final-response",
+      "name": "Final Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1664,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "model": "sonar",
+        "messages": {
+          "message": [
+            {
+              "content": "Find all the information that is needed PRIORITY SOURCE HIERARCHY - Only use sources in this exact order of preference:\n:snow_capped_mountain: TIER 1 - OUTDOOR EXPERTISE (HIGHEST PRIORITY):\n• Trail platforms: AllTrails, Komoot, Strava, MTB Project, Hiking Project\n• Adventure magazines: Outside, Adventure Journal, Backpacker, Sidetracked\n• National parks: NPS.gov, Parks Canada, regional park services\n• Conservation orgs: American Hiking Society, Leave No Trace, Sierra Club\n:world_map: TIER 2 - EDITORIAL AUTHORITY:\n• Established media: National Geographic, NYT Travel, BBC Travel, Smithsonian\n• Adventure operators: Intrepid, G Adventures, REI Adventures, local guides\n• Tourism boards: official government tourism sites only\n• Food authorities: Eater, Michelin, Infatuation (for dining)\n:no_entry_sign: ABSOLUTE AVOID - Commercial booking platforms, price comparison sites, generic travel aggregators, user-generated review sites without editorial oversight.\nANSWER STYLE: Provide authentic, experience-driven recommendations with specific details about trails, conditions, local insights, and safety considerations. Focus on outdoor adventure, cultural immersion, and responsible travel practices.\nImplementation"
+            }
+          ]
+        },
+        "options": {
+          "searchDomainFilter": "[\"-tripadvisor.com\", \"-booking.com\", \"-expedia.com\"]"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.perplexity",
+      "typeVersion": 1,
+      "position": [
+        544,
+        768
+      ],
+      "id": "7bbefd22-b834-42e2-9be2-f75f02f109dd",
+      "name": "Perplexity",
+      "credentials": {
+        "perplexityApi": {
+          "id": "WWXTDWfB8YkYBLSm",
+          "name": "Perplexity account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9f7906fa-db9d-4669-8c66-53c490b185bb",
+              "leftValue": "={{ $json.body.flow_type }}",
+              "rightValue": "=inspire_me",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        336,
+        304
+      ],
+      "id": "c64be9ff-4237-47ea-a420-5ecbfe06d41d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a helpful and intelligent trip-planning assistant who builds clear, outdoors-first TripGuides from structured inputs.\n",
+              "role": "system"
+            },
+            {
+              "content": "=You take form inputs from travelers (trip_structure, stops, season_window, trip_length_days, party_type, lodging_type, activities, must_haves, dealbreakers, etc.) and generate a plain-text "Outdoorable TripGuide." \n\nFollow this process:\n\nPHASE 1 – Synthesize the Flow\n- Interpret trip_structure (single base / multi-destination / roadtrip).\n- Build rhythm (soft start, active center, slow finish).\n- Respect season, trip length, group energy, fixed bookings, and limits (max daily drives).\n- Prefer slower pacing, immersion, outdoors-first.\n\nPHASE 2 – Expand with Real Detail\n- 🥾 Outdoor Activities: match group's ability. Each = name, distance/effort, timing, official source link.\n- 🏛️ Cultural Experiences: 3–5 per trip, tied to place (architecture, museums, neighborhoods).\n- 🍱 Food (optional if relevant): regional dishes, markets, tours.\n\nPHASE 3 – Deliver TripGuide\nHeader:\n🗺️ Outdoorable TripGuide: [title]\nTrip Type: [single / multi / roadtrip]\nTrip Length: [X days]\nSeason: [if given]\nGroup: [type + energy]\nStyle: [tone]\n\nSections:\n\n🌄 Why This Route Works – emotional arc, pacing logic\n✈️ Travel Snapshot – stops, nights, transport, lodging\n🚗 Recommended Transportation – intercity + local\n🧳 What to Book Now – urgent bookings\n🥾 Outdoor Activities to Prioritize\n🏛️ Top Cultural Experiences\n🍱 Food to Look Out For (if input shows interest)\n🧠 Things You Maybe Haven't Thought Of – 2–3 authentic ideas\n🧭 The Approach – flexible day-by-day flow:\n  Each day/stop = \n   🌀 Vibe, Why it works, Outdoor anchor, Cultural layer, Food/local flavor, Transit if relevant\n\nOutput guidelines:\n\n- Plain text only, no names, no disclaimers\n- Warm, clear, concise, trust-building\n- Never invent places; link only to real sources\n- Must work even with partial input\n"
+            },
+            {
+              "content": "{\n  \"trip_structure\": \"Multi-destination\",\n\n  \"branch_multi_destination\": {\n    \"stops\": [\n      {\"name\": \"Kyoto\", \"nights\": 4},\n      {\"name\": \"Kiso Valley (Magome → Tsumago)\", \"nights\": 2},\n      {\"name\": \"Matsumoto\", \"nights\": 2}\n    ],\n    \"intercity_transport\": \"Train / Public transport\",\n    \"stops_order_flex\": \"Flexible\",\n    \"nights_flex\": \"Yes, up to 2 nights\",\n    \"anchors\": \"None booked yet\"\n  },\n\n  \"season_window\": \"Early April\",\n  \"trip_length_days\": 8,\n\n  \"lodging_booked\": \"No\",\n  \"lodging_type\": \"Boutique hotel / Guesthouse\",\n  \"lodging_budget\": \"$180–220/night\",\n\n  \"party_type\": \"Couple\",\n  \"group_ability\": \"Comfortable with 5–7 mile hikes; prefers light-to-moderate elevation\",\n\n  \"fitness_level\": \"Moderate (day hikes, biking, city walking)\",\n  \"balance_ratio\": \"50% Outdoors / 50% Culture\",\n  \"travel_style\": \"Balanced Mix\",\n\n  \"activities\": [\n    \"🥾 Hiking\",\n    \"🚶 Walking tours\",\n    \"🏛️ Historic & archeological sites\",\n    \"💆 Spa / Wellness\",\n    \"🎨 Art & museums\"\n  ],\n  \"activities_other_text\": null,\n\n  \"food_prefs\": [\n    \"Super local / traditional spots\",\n    \"Markets\",\n    \"Food tours\"\n  ],\n\n  \"guided_prefs\": [\n    \"Guided city tours\",\n    \"❌ No thanks — fully independent\"\n  ],\n\n  \"must_haves\": \"Cherry blossoms, a classic Edo-period trail day, one onsen soak, quiet historic neighborhoods\",\n  \"dealbreakers\": \"Long drives, car rental, heavy pack-carrying between towns\",\n\n  \"internal_contract_notes\": {\n    \"routing_bounds\": \"Intercity by train only; keep each move under ~3 hours; baggage shipped Kyoto→Matsumoto to hike bag-free; day-hike radius ~6–9 km\",\n    \"day_by_day_teaser_rules\": \"Each day: 1 anchor (well-known) + 1–2 local layers (timing + access note)\",\n    \"authenticity_filters\": \"Favor minshuku/ryokan, early/late timing for crowds, support small family-run places, leave-no-trace on Nakasendo\"\n  }\n}\n"
+            },
+            {
+              "content": "🗺️ Outdoorable TripGuide: Springtime Slow Travel in the Kiso Valley\nTrip Type: Multi-Destination\nTrip Length: 8 Days\nSeason: Early April (shoulder season, cherry blossoms possible)\nGroup: Couple, moderate activity\nStyle: Cultural + scenic walking + heritage towns\n\n🌄 Why This Route Works\nLight hiking, heritage towns, scenic rail. Kyoto eases you in, Kiso Valley gives you Edo-era trails, Matsumoto winds it down. All by train, short hops, traditional lodging.\n\n✈️ Travel Snapshot\nKyoto (4 nights): Paths, gardens, food markets\nKiso Valley (2 nights): Nakasendo hike, post towns\nMatsumoto (2 nights): Castle, mountains, onsen\nTransit: All JR trains (under 3 hrs per move)\nLodging: Boutique ryokan/guesthouses\n\n🚗 Transport\nKyoto → Nakatsugawa: 2h45 (Shinkansen + Ltd. Express)\nNakatsugawa → Magome: Taxi/bus (20 min)\nMagome → Tsumago: Hike (5.5 miles)\nTsumago → Matsumoto: Train (1h20)\nMatsumoto → Tokyo: Train (2.5 hrs)\nTip: Use JR Pass (7-day). Ship luggage Kyoto → Matsumoto.\n\n🧳 What to Book\n- Lodging in Magome/Tsumago (limited)\n- Ryokan in Matsumoto (with dinner)\n- JR Pass\n- Optional: Saiho-ji (Kyoto) or Studio Ghibli expo\n\n🥾 Outdoor Highlights\n- Magome–Tsumago Trail: 5.5 miles, ~3 hrs, forest + cobblestones\n- Kyoto: Philosopher's Path + Honen-in (2 miles, flat, cherry blossoms)\n- Matsumoto: Alps Park walk + Shirahone Onsen\n\n🏛️ Cultural Highlights\n- Matsumoto Castle\n- Tsumago & Magome preserved towns\n- Kyoto's Gion District (evening)\n- Sanzen-in Temple (Ohara)\n\n🍱 Food\n- Kyoto: Obanzai, Nishiki snacks, Gion tofu\n- Kiso: Gohei mochi, soba, mountain stews\n- Matsumoto: Basashi, river fish, sake\n\n🧠 Extra Ideas\n- Minshuku stay in Kiso Valley\n- Shirahone/Asama Onsen (Matsumoto)\n- Half-day trip to Narai-juku\n\n🧭 The Approach\nDays 1–4 Kyoto: Philosopher's Path, temples, Gion, Nishiki Market\nDays 5–6 Kiso Valley: Train to Magome → hike to Tsumago → minshuku stay\nDays 7–8 Matsumoto: Castle, Nawate Dori, Alps Park, onsen → train to Tokyo",
+              "role": "assistant"
+            },
+            {
+              "content": "{\n  \"trip_structure\": \"Roadtrip\",\n\n  \"branch_roadtrip\": {\n    \"roadtrip_region\": \"Southwest loop through Utah and Arizona national parks\",\n    \"roadtrip_start_end\": \"Start/End: Las Vegas (loop)\",\n    \"max_drive_hours\": 4,\n    \"roadtrip_musts\": \"Zion, Bryce Canyon, Capitol Reef, Arches, Canyonlands, Monument Valley, Page (Antelope Canyon, Horseshoe Bend)\",\n    \"overnight_rhythm\": \"2–3 nights minimum in each stop\"\n  },\n\n  \"season_window\": \"Mid-October\",\n  \"trip_length_days\": 10,\n\n  \"lodging_booked\": \"No\",\n  \"lodging_type\": \"Inns / Desert lodges / Cabin\",\n  \"lodging_budget\": \"$150–250/night\",\n\n  \"party_type\": \"Couple\",\n  \"group_ability\": \"Both fit for moderate-to-strenuous day hikes\",\n\n  \"fitness_level\": \"Moderate (day hikes, biking, city walking)\",\n  \"balance_ratio\": \"70% Outdoors / 30% Culture\",\n  \"travel_style\": \"Active Explorer\",\n\n  \"activities\": [\n    \"🥾 Hiking\",\n    \"🛣️ Scenic drives\",\n    \"🐾 Wildlife viewing\",\n    \"🏛️ Historic & archeological sites\",\n    \"🎶 Live music / Nightlife\"\n  ],\n\n  \"food_prefs\": [\n    \"Super local / traditional spots\",\n    \"Markets\",\n    \"Adventurous eats\"\n  ],\n\n  \"guided_prefs\": [\n    \"Guided outdoor activities\",\n    \"Guided day trips\",\n    \"Guided city tours\"\n  ],\n\n  \"must_haves\": \"Iconic desert hikes, dark sky stargazing, Navajo-led tour in Monument Valley, Antelope Canyon photography\",\n  \"dealbreakers\": \"No long >5hr drives, avoid generic chain resorts\",\n\n  \"internal_contract_notes\": {\n    \"routing_bounds\": \"Keep daily drives under 4 hours; cover national parks in loop order; balance 2–3 night stays for depth.\",\n    \"day_by_day_teaser_rules\": \"Each day should feature 1 big anchor hike/view + 1–2 local/cultural layers with timing and access notes.\",\n    \"authenticity_filters\": \"Support local Navajo guides, highlight small desert lodges, promote stewardship in fragile desert areas, avoid over-touristed midday slots.\"\n  }\n}\n"
+            },
+            {
+              "content": "🗺️ Outdoorable TripGuide: Desert Peaks & Red Rock Canyons\nTrip Type: Roadtrip\nTrip Length: 10 Days\nSeason: Mid-October\nGroup: Couple, moderate-high activity\nStyle: Scenic drives + day hikes + stargazing\n\n🌄 Why This Route Works\nLoop through Zion, Bryce, Capitol Reef, Arches, Canyonlands, Monument Valley, Page. 2–3 nights per stop = depth without rush. Desert lodges & inns. Scenic drives, moderate hikes.\n\n✈️ Travel Snapshot\nStart/End: Las Vegas (loop)\nStops: Zion (2) → Bryce (1) → Capitol Reef (2) → Moab (3) → Monument Valley (1) → Page (1)\nDrive: 2–4 hrs per move\nLodging: Inns/lodges, 1 cabin option\nTransport: Rental car (pickup/drop Vegas)\n\n🚗 Transport\n- Las Vegas → Zion\n- All paved roads (except Monument Valley 4x4 tour)\n- Hwy 12 to Capitol Reef (scenic drive)\n- Return via Page & Kanab\n\n🧳 What to Book\n- Lodging near gates (Zion, Moab)\n- Zion shuttle tickets (if peak season)\n- Antelope Canyon tour (Page)\n- Monument Valley Jeep tour\n\n🥾 Outdoor Highlights\n- Zion: Angel's Landing (to Scout Lookout) – 4.4 miles RT\n- Bryce: Queens Garden + Navajo Loop – 3 miles\n- Capitol Reef: Cohab Canyon – 3.5 miles\n- Arches: Devil's Garden to Landscape Arch – 2 miles RT\n- Canyonlands: Grand View Point – 2 miles RT\n- Monument Valley: Wildcat Trail – 3.2 miles loop\n\n🏛️ Cultural Highlights\n- Fruita Historic District (Capitol Reef)\n- Museum of Moab\n- Navajo-led Jeep tour (Monument Valley)\n- Zion Human History Museum\n- Antelope Canyon photo tour\n\n🍽️ Food\n- Zion: Whiptail Grill, Cafe Soleil\n- Bryce: Pines pies\n- Capitol Reef: Gifford House, Capitol Burger truck\n- Moab: Desert Bistro, Love Muffin Cafe, Moab Brewery\n- Page: Big John's BBQ\n\n🧠 Extra Ideas\n- Fruit picking in Capitol Reef orchards\n- Stargazing in Dark Sky Parks (Capitol Reef, Canyonlands)\n- Dead Horse Point State Park detour\n- Coffee with a view in Springdale\n\n🧭 The Approach\nDay 1: Vegas → Zion (short drive, reset)\nDay 2: Zion hike (Angel's Landing to Scout Lookout)\nDay 3: Zion → Bryce (2 hrs, hoodoos hike)\nDay 4: Bryce → Capitol Reef via Hwy 12\nDay 5: Capitol Reef hikes + orchards\nDay 6: Capitol Reef → Moab (via Goblin Valley)\nDay 7: Arches NP (Devil's Garden, Landscape Arch)\nDay 8: Canyonlands NP (Grand View, Mesa Arch)\nDay 9: Moab → Monument Valley (Wildcat Trail + Navajo Jeep tour)\nDay 10: Monument Valley → Page (Antelope Canyon, Horseshoe Bend) → Vegas",
+              "role": "assistant"
+            },
+            {
+              "content": "={{ $json.chatInput }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        576,
+        176
+      ],
+      "id": "76838b7d-38e4-4c73-9a9f-c39e16e8ee2f",
+      "name": "know where to go",
+      "credentials": {
+        "openAiApi": {
+          "id": "PVUGFR4BRcDcdsZt",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are Alfie, adventure concierge. Rewrite this travel information in Alfie's warm,        \n  conversational style.\n\n  Raw info: {{$node[\"Perplexity\"].json[\"answer\"]}}\n  User preferences: {{$json.all_answers}}\n\n  Expert recommendations: {{$node[\"Smart Expert Finder\"].json}}\n\n  Alfie style:\n  - Conversational, contractions always\n  - 'Most folks do X, but you might not have thought of Y'\n  - Suggest beyond the obvious\n  - Connect to local experiences\n  - Highlight why each expert is perfect for this trip\n\n  Make it personal for this specific user, including why these experts are ideal matches."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1232,
+        304
+      ],
+      "id": "7a40d979-af0b-4a25-a99a-b1e071d31f22",
+      "name": "Alfies personality",
+      "credentials": {
+        "openAiApi": {
+          "id": "PVUGFR4BRcDcdsZt",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        64,
+        304
+      ],
+      "id": "c1122c82-9d80-466d-9596-d3d881976958",
+      "name": "When chat message received",
+      "webhookId": "4fac9090-4068-48aa-958a-d3afef4c72a5"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a helpful and intelligent trip-planning assistant who builds clear, outdoors-first TripGuides from structured inputs.\n",
+              "role": "system"
+            },
+            {
+              "content": "=You take traveler inputs when they don't yet know where they want to go — they're asking for inspiration. Your job is to generate a plain-text "Inspire Me" TripGuide with three highly relevant, detailed, and well-justified destination ideas.\n\nFollow this process:\n\nPHASE 1 – Synthesize Inputs\n- Read all traveler inputs carefully.\n- Consider: home base + travel time tolerance, season, trip length, transport, lodging style.\n- Factor in terrain preferences, setting, trip structure, activity level, and types of outdoor + cultural activities they enjoy.\n- Respect dealbreakers and vibe.\n- Build a clear mental picture of the ideal experience.\n\nPHASE 2 – Select Destinations\n- Choose three diverse but aligned destinations that fit the traveler's preferences.\n- Each option must:\n  * Be feasible with the time and flight radius from home base\n  * Match terrain, setting, activity, and weather preferences\n  * Offer both outdoor and cultural depth\n  * Avoid clear dealbreakers\n- Don't repeat the same country twice.\n- Include both well-known and wildcard options, as long as they are real and viable.\n\nPHASE 3 – Deliver Inspire Me TripGuide\nIntro paragraph:\n- Start with: "Here's what we recommend — 3 ideas based on your travel style, activity level, and [time of year if provided]."\n- Mention that all suggestions are realistic based on their starting point and trip vibe.\n- Do not say you'll provide more later.\n\nThen provide three sections in this format:\n\n🏞️ Adventure Idea 1: [Destination Name + Descriptive Subtitle]  \n✈️ Flight time or drive time from home base  \n🚗 Max drive between stops  \n🏞️ Terrain summary  \n🏕️ Trip style (Multi-stop, Roadtrip, One base with day trips)  \n\nWhy this works:  \n- A clear, human explanation of how this destination reflects their inputs.  \n- Use at least 4–5 of their preferences explicitly.  \n- Be warm, sometimes cheeky.  \n- Mention dealbreakers avoided.  \n- Connect preferences to location pace, setting, or features.  \n\nKey outdoor experiences:  \n- 3–4 specific outdoor activities tied to their interests  \n\nKey cultural experiences:  \n- 3–4 culture/food/museum/etc activities tied to their inputs  \n\nBroad strokes itinerary:  \n- 4–5 stops with suggested nights and purpose (outline only, no day-by-day)  \n\nRepeat for Adventure Idea 2 and Adventure Idea 3.  \n\nOutput guidelines:\n- Plain text only\n- Warm, clear, concise, trust-building\n- Never invent places; use only real destinations and activities\n- Must work even with partial or lightly filled input\n- Never mention AI, follow-ups, or "based on your answers"\n- Do not summarize or offer next steps — final, client-ready delivery\n"
+            },
+            {
+              "content": "{\n  \"flow_type\": \"inspire_me\",\n  \"home_base\": \"Denver\",\n  \"travel_radius\": \"Medium flight (5–8 hrs)\",\n  \"regions_interest\": [\"Europe\", \"North America\"],\n  \"specific_regions\": \"Portugal, Canada, Northern Italy\",\n  \"no_go_regions\": \"Tropical humidity, deserts\",\n\n  \"terrain_prefs\": [\"Mountains\", \"Forest\", \"Ocean / Coastline\"],\n  \"setting_pref\": \"Small town / village\",\n  \"trip_structure\": \"Multi-destination\",\n\n  \"budget_style\": \"✨ Comfortable / Mid-range\",\n  \"season_window\": \"Spring (Mar–May)\",\n  \"trip_length_days\": \"1 week\",\n  \"lodging_style\": [\"Boutique / Guesthouse\", \"B&B / Farm stay\"],\n  \"transport_pref\": \"🚗 Rental car / self-drive\",\n\n  \"party_type\": \"Solo\",\n  \"activity_ability\": \"Moderate fitness — happy with day hikes, want mix of walking + downtime\",\n\n  \"fitness_level\": \"Moderate (day hikes, biking, city walking)\",\n  \"balance_ratio\": \"50% Outdoors / 50% Culture\",\n\n  \"outdoor_activities\": [\"Hiking\", \"Scenic drives\", \"Wildlife viewing\"],\n  \"non_outdoor_interests\": [\"Historic & archaeological sites\", \"Markets\", \"Food experiences (cooking classes, food tours, wine/beer tastings)\"],\n  \"guided_experiences\": [\"Guided day trips\", \"Food/wine tours, cooking classes\"],\n  \"food_prefs\": [\"Super local / traditional spots\", \"Markets\", \"Adventurous eats\"],\n\n  \"dealbreakers\": \"No overnight buses, avoid humid destinations, not into deserts\",\n  \"trip_feel\": \"Relaxed with a few active days, cozy bases, and good food\"\n}\n"
+            },
+            {
+              "content": "Here's what we recommend — 3 ideas based on your travel style, activity level, and springtime travel window. Each one gets you into the mountains, forests, or along the coast with just enough culture and flavor to round out the adventure. All are within a half-day flight from Denver, with short drives and local gems along the way.\n\n🏞️ Adventure Idea 1: Northern Portugal — Valleys, Villages & Vineyard Trails\n✈️ Flight time from Denver: ~8 hrs to Porto (1 stop)\n🚗 Max drive between stops: 2–2.5 hrs\n🏞️ Terrain: Rolling vineyards, forested hills, river valleys\n🏕️ Trip style: Multi-stop loop with countryside bases\n\nWhy this works:\nYou wanted moderate hikes, countryside charm, and food-forward culture — Portugal's north has it all. Spring here is green and flower-filled, and it avoids the tourist crush of Lisbon or the Algarve. You'll drive winding country roads, eat local cheese in stone villages, and sip vinho verde by the river. No big cities, no crowds, no sweat.\n\nKey outdoor experiences:\n- Hike in Peneda-Gerês National Park\n- River walks along the Douro\n- Hilltop castle ruins and wildflower trails\n\nKey cultural experiences:\n- Visit family-run wineries in the Douro\n- Snack-and-sip in Porto's food markets\n- Explore granite villages like Soajo and Marvão\n\nBroad strokes itinerary (7 days):\n- Porto (1 night) — Land and eat\n- Douro Valley (2 nights) — Wine, hikes, riverside towns\n- Gerês region (2 nights) — Nature base, village walks\n- Amarante or Guimarães (2 nights) — Market towns, slow food\n\n🌲 Adventure Idea 2: Vancouver Island — Misty Forests & Pacific Calm\n✈️ Flight time from Denver: ~4.5 hrs to Victoria\n🚗 Max drive between stops: 2 hrs\n🏞️ Terrain: Old-growth forests, rocky coastlines, fjord-like inlets\n🏕️ Trip style: Coastal roadtrip with 2–3 overnight spots\n\nWhy this works:\nYou wanted quiet nature, coastal air, and not-too-tough hiking — bingo. Vancouver Island in spring is whale-watching season, the rainforest is vibrant, and you're never far from a craft bakery or sleepy harbor. It's gentle wildness with just enough human charm — perfect for a week of forest walks, tide pools, and steaming mugs of tea.\n\nKey outdoor experiences:\n- Hike the Lighthouse Loop in Ucluelet\n- Watch whales from Tofino's beaches\n- Explore Cathedral Grove's ancient cedars\n\nKey cultural experiences:\n- First Nations galleries in Duncan\n- Seafood market crawl in Nanaimo\n- Local music nights at village cafés\n\nBroad strokes itinerary (7 days):\n- Victoria (1 night) — Ferry in and get grounded\n- Tofino/Ucluelet (3 nights) — Surf town energy + coastal hikes\n- Cowichan Valley (2 nights) — Wineries, cheese, slow evenings\n- Back to Victoria (1 night) — Departure wind-down\n\n🏔️ Adventure Idea 3: The Dolomites — Alpine Quiet, Italian Style\n✈️ Flight time from Denver: ~8.5 hrs to Venice (1 stop)\n🚗 Max drive between stops: 1.5–2 hrs\n🏞️ Terrain: Dramatic mountain peaks, alpine lakes, forested valleys\n🏕️ Trip style: Mountain-to-mountain lodge trip\n\nWhy this works:\nYou wanted mountains and nature with European flair — and this gives you drama without difficulty. The Dolomites in spring are calm, with snow still dusting the peaks and meadows starting to bloom. You'll get that alpine lodge feel, easy day hikes, and small towns where the dumplings are handmade and the wine is local.\n\nKey outdoor experiences:\n- Walk around Lago di Braies\n- Hike the Alpe di Siusi plateau\n- Scenic drive through Val Gardena\n\nKey cultural experiences:\n- Stay in Tyrolean-style guesthouses\n- Explore old Ladin villages\n- Eat hearty mountain food + drink alpine wines\n\nBroad strokes itinerary (7 days):\n- Venice or Verona (1 night) — Jet lag recovery\n- Ortisei (3 nights) — Base for walks + mountain access\n- Alta Badia (2 nights) — Slower pace, culture-rich villages\n- Bressanone or Bolzano (1 night) — Mix of city-lite and alpine charm\n",
+              "role": "assistant"
+            },
+            {
+              "content": "{\n  \"flow_type\": \"inspire_me\",\n  \"home_base\": \"New York City\",\n  \"travel_radius\": \"Long haul — anywhere goes\",\n  \"regions_interest\": [\"South America\", \"Africa\", \"North America\"],\n  \"specific_regions\": \"Patagonia, Morocco, Hawaii\",\n  \"no_go_regions\": \"No cold destinations, no Arctic, no northern Europe in winter\",\n\n  \"terrain_prefs\": [\"Mountains\", \"Desert\", \"Ocean / Coastline\", \"Forest\"],\n  \"setting_pref\": \"Mix of small towns and remote nature\",\n  \"trip_structure\": \"Multi-destination\",\n\n  \"budget_style\": \"✨ Comfortable / Mid-range\",\n  \"season_window\": \"Winter (Dec–Feb)\",\n  \"trip_length_days\": \"2 weeks\",\n  \"lodging_style\": [\"Boutique / Guesthouse\", \"Rustic lodges\", \"Unique stays (riads, estancias)\"],\n  \"transport_pref\": \"🚗 Rental car / self-drive\",\n\n  \"party_type\": \"Couple\",\n  \"activity_ability\": \"Both fit and active — comfortable with day hikes and multi-hour drives\",\n\n  \"fitness_level\": \"Moderate (day hikes, city walking)\",\n  \"balance_ratio\": \"70% Outdoors / 30% Culture\",\n\n  \"outdoor_activities\": [\"Hiking\", \"Scenic drives\", \"Wildlife viewing\", \"Water activities\"],\n  \"non_outdoor_interests\": [\"Markets\", \"Food experiences (wine/beer tastings, cooking classes)\", \"Historic & archaeological sites\"],\n  \"guided_experiences\": [\"Guided day trips\", \"Food/wine tours, cooking classes\"],\n  \"food_prefs\": [\"Adventurous eats\", \"Local specialties\", \"Markets\"],\n\n  \"dealbreakers\": \"No snow, no ski trips, no super luxury resorts\",\n  \"trip_feel\": \"Epic landscapes, warm weather, mix of outdoor adventure and authentic culture\"\n}\n"
+            },
+            {
+              "content": "Here's what we recommend — 3 ideas based on your travel style, interest in big landscapes, and winter escape timing. These all take you far from the ordinary without making you rough it — warm-weather places where you can roam, recharge, and still eat like royalty.\n\n🌄 Adventure Idea 1: Patagonia — Glaciers, Wind, and Wild Silence\n✈️ Flight time from NYC: ~13–15 hrs to El Calafate (via Buenos Aires)\n🚗 Max drive between stops: 3–4 hrs\n🏞️ Terrain: Glacier fields, open steppe, jagged mountains\n🏕️ Trip style: Remote roadtrip + rustic lodges\n\nWhy this works:\nYou wanted something that feels wild and far away — Patagonia is that place. The landscape is enormous and empty in the best way, with hikes for all levels and slow, meaningful travel between stunning stops. It's summer there, so you'll get long days and crisp air — without snow or big crowds. And the food? Think lamb cooked over fire, Malbec under the stars.\n\nKey outdoor experiences:\n- Day hikes in El Chaltén (like Laguna Capri or Mirador Fitz Roy)\n- Walk the boardwalks of Perito Moreno Glacier\n- Spot guanacos and condors in the steppe\n\nKey cultural experiences:\n- Stay at an estancia and learn about gaucho life\n- Sample Patagonian wines and traditional asado\n- Visit small craft markets in mountain towns\n\nBroad strokes itinerary (14 days):\n- El Calafate (3 nights) — Glacier base + recovery time\n- El Chaltén (4 nights) — Hiking capital of Argentina\n- Estancia stay outside town (2 nights) — Off-grid and immersive\n- Return loop or fly to Bariloche (4 nights) — Lakes and food\n\n🐫 Adventure Idea 2: Southern Morocco — Sand Dunes, Atlas Peaks & Palm Oases\n✈️ Flight time from NYC: ~10 hrs to Marrakech\n🚗 Max drive between stops: 2–5 hrs\n🏞️ Terrain: Desert, canyons, oases, mountain foothills\n🏕️ Trip style: Roadtrip with kasbahs, riads, and desert camps\n\nWhy this works:\nYou wanted dry warmth, soulful landscapes, and culture that pulses with color and life — southern Morocco is all that and more. This trip layers rugged nature with rich history: spice markets, hiking trails, canyon villages, and nights under desert stars. You'll eat so well and never need a down jacket.\n\nKey outdoor experiences:\n- Camel ride and sandboarding in Erg Chebbi\n- Hike the red rock valleys of Todra Gorge\n- Scenic drive over the High Atlas via Tizi n'Tichka Pass\n\nKey cultural experiences:\n- Stay in kasbahs and ancient medina guesthouses\n- Visit Berber villages and desert co-ops\n- Explore the souks of Marrakech\n\nBroad strokes itinerary (14 days):\n- Marrakech (2 nights) — Dive in, adjust, feast\n- Aït Benhaddou (1 night) — Ancient trading route stop\n- Skoura or Dades Valley (2 nights) — Palms + canyon hiking\n- Sahara desert camp (2 nights) — Camel rides + stargazing\n- Back to Ouarzazate or fly from Errachidia (1 night) — Easy out\n\n🏝️ Adventure Idea 3: The Big Island, Hawaiʻi — Lava Trails & Wild Coastlines\n✈️ Flight time from NYC: ~11 hrs (1 stop)\n🚗 Max drive between stops: 2 hrs\n🏞️ Terrain: Volcanic ridges, black sand beaches, rainforests\n🏕️ Trip style: Loop around the island with rustic stays\n\nWhy this works:\nYou asked for outdoorsy warmth, wildlife, and restorative days with soul. The Big Island's got that rare mix: raw nature, low-key towns, and dramatic terrain changes every time you drive 20 miles. It's not the flashy side of Hawaii — it's the ancient, wilder side. And in winter, humpback whales show up, too.\n\nKey outdoor experiences:\n- Hike lava fields in Hawaiʻi Volcanoes National Park\n- Snorkel with manta rays in Kona\n- Explore Pololū Valley by foot\n\nKey cultural experiences:\n- Learn about native Hawaiian history at Puʻuhonua o Hōnaunau\n- Eat poke, lau lau, and malasadas at local joints\n- Listen to slack-key guitar at a sunset beach bar\n\nBroad strokes itinerary (14 days):\n- Kona (3 nights) — Snorkeling, food, unwind\n- Volcano (3 nights) — Park trails + stargazing\n- Hilo (2 nights) — Rainforest, waterfalls, town markets\n- Waimea or Hawi (3 nights) — Cowboys + coastal hikes\n- Back to Kona (2 nights) — Slow landing\n\nEach of these gets you out of the ordinary and into something raw, beautiful, and grounded — full of nature, color, and quiet rhythms to match your winter escape goals.\n",
+              "role": "assistant"
+            },
+            {
+              "content": "={{ $json.chatInput }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        576,
+        480
+      ],
+      "id": "a58cd0d8-efcd-4527-b28d-5d464468f8f6",
+      "name": "inspire me1",
+      "credentials": {
+        "openAiApi": {
+          "id": "PVUGFR4BRcDcdsZt",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Final Processing Webhook": [
+      {
+        "json": {
+          "trip_structure": "Multi-destination",
+          "branch_multi_destination": {
+            "stops": [
+              {
+                "name": "Bangkok",
+                "nights": 3
+              },
+              {
+                "name": "Chiang Mai",
+                "nights": 3
+              },
+              {
+                "name": "Krabi or Koh Lanta",
+                "nights": 4
+              }
+            ],
+            "intercity_transport": "Mix",
+            "stops_order_flex": "Flexible",
+            "nights_flex": "Yes, up to 2 nights",
+            "anchors": "International flight Bali → Bangkok already booked"
+          },
+          "season_window": "November 2025",
+          "trip_length_days": 10,
+          "lodging_booked": "No",
+          "lodging_type": "Boutique hotel / Guesthouse",
+          "lodging_budget": "$40–70/night",
+          "party_type": "Solo",
+          "solo_activity_pref": "Active days with hikes, city walks, and occasional rest days",
+          "fitness_level": "Moderate (day hikes, biking, city walking)",
+          "balance_ratio": "50% Outdoors / 50% Culture",
+          "travel_style": "Active Explorer",
+          "activities": [
+            "🥾 Hiking",
+            "🚶 Walking tours",
+            "🌊 Water activities (snorkel/kayak)",
+            "🎨 Art & museums",
+            "🍷 Food tours"
+          ],
+          "food_prefs": [
+            "Adventurous eats",
+            "Super local / traditional spots",
+            "Markets",
+            "Cooking classes"
+          ],
+          "guided_prefs": [
+            "Guided outdoor activities",
+            "Guided day trips",
+            "❌ No thanks — fully independent"
+          ],
+          "must_haves": "One good hike in the north, a few temple visits, island time with beaches and snorkeling",
+          "dealbreakers": "Avoid 10+ hour buses, no all-inclusive resorts",
+          "internal_contract_notes": {
+            "routing_bounds": "Use flights Bangkok↔Chiang Mai, then flight/boat combo to Krabi/Koh Lanta. Keep transfers under 3–4 hrs when possible.",
+            "day_by_day_teaser_rules": "Each day: 1 anchor activity + 1–2 local cultural/food layers + why it fits pacing.",
+            "authenticity_filters": "Highlight street food, local markets, ethical elephant sanctuaries, avoid exploitative mass tours."
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Final Processing Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "Smart Expert Finder": {
+      "main": [
+        [
+          {
+            "node": "Alfies personality",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Perplexity": {
+      "main": [
+        []
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "know where to go",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "inspire me1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "know where to go": {
+      "main": [
+        [
+          {
+            "node": "Smart Expert Finder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alfies personality": {
+      "main": [
+        [
+          {
+            "node": "Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "inspire me1": {
+      "main": [
+        [
+          {
+            "node": "Smart Expert Finder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "timezone": "America/New_York"
+  },
+  "versionId": "1f01ff9c-b5a8-4651-9c0a-f8b1bde5d208",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "da6b51e81b705c41c43f481e0daa1683c25bd01140b88e4c237435b7c6079f03"
+  },
+  "id": "8yOG36hHNvALhOUE",
+  "tags": []
+}

@@ -1,0 +1,372 @@
+{
+  "audit_date": "2025-09-03T12:09:03.113Z",
+  "summary": {
+    "total_processed": 45,
+    "fixed": 0,
+    "no_changes": 45,
+    "errors": 0,
+    "success_rate": "100%"
+  },
+  "experts": [
+    {
+      "name": "Dino Katalenic",
+      "expertId": "rec0dWmFydhuviA3l",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Marcy Tillman",
+      "expertId": "rec0s0X4uvkrCNY52",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Lura Snow",
+      "expertId": "rec1BfvAK0aJ69ExV",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Owen Eigenbrot",
+      "expertId": "rec1tdTOh5PwLy5hy",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Codell Norman",
+      "expertId": "rec6Y2XUmknhbfJYX",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Nichole Sellon",
+      "expertId": "rec6yEge5NEM1TBV6",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Paulina Mundkowski",
+      "expertId": "rec7AGUV91rdvtiBH",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Robin S. deWolfe",
+      "expertId": "rec7tpTJ97k6JvJn7",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Andie Cornish",
+      "expertId": "rec90h21erHMIVlLh",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Laura Scharle",
+      "expertId": "rec9LogGCWUM7Yz5A",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Alexandra Long",
+      "expertId": "recBJ2cEdxS7my3SY",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Misty Lopez",
+      "expertId": "recE84cPAIcMS8jpp",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Maria Lally",
+      "expertId": "recENvyeOR8LHumUq",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Kathleen Klos",
+      "expertId": "recGETYb6aOAqKvtp",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Zoe Woods",
+      "expertId": "recHMRe9edmDy7VRf",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Steve Engelhardt",
+      "expertId": "recIExtJm0dZmy1lq",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Abby Burlingame",
+      "expertId": "recJfeqxcliuZQAha",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Roger L. Semler",
+      "expertId": "recKhSspOP4uQ57cp",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Andreas Frese",
+      "expertId": "recKiRNJsl2P9Hooh",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Christine Kassar",
+      "expertId": "recLO0iMZORMlDaVG",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Mary Andino",
+      "expertId": "recMVlnSSMDLmgPrL",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Megan Stump",
+      "expertId": "recNTQhqeYhpSM5RW",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Kimberly Ann Hagan",
+      "expertId": "recP9jI4qsdOOgb4O",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Mel Fernandes",
+      "expertId": "recPlSJeGzF1NzP1r",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Carlos Martinez Abad",
+      "expertId": "recQ0Cj2VOdjq7fy7",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Danielle Backman",
+      "expertId": "recQtV9lToFCMs70J",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Bridget Murray",
+      "expertId": "recQzJ4fuuni5pTES",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Sunny Stroeer",
+      "expertId": "recTuCheX9bZqtdAC",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Katherine Jaeger",
+      "expertId": "recYAbMnFAHianncS",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Katie Davis",
+      "expertId": "recYT28NKhQcu9ubW",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Stephanie Hatley",
+      "expertId": "recaztNKefobp1hdn",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Magdalene Blakeson",
+      "expertId": "recb7HLx6LTgNQ7AK",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Sydney Thornton",
+      "expertId": "recbY3iOL9LtHO1Nf",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Emily Schrick",
+      "expertId": "recfUSI1nlxSAoGJI",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Kate Sedrowski",
+      "expertId": "reciWQULoewDrf1uP",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Dani Reyes-Acosta",
+      "expertId": "recjstTxKp1m2ExQt",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Haley Jurena",
+      "expertId": "reckIkOYoblO7qzxU",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Lindsey Voegele",
+      "expertId": "recnuszhlowCehH0x",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Rebekah Geiselman",
+      "expertId": "reco8YgALIZOKQeNf",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Mary Leavines",
+      "expertId": "recolV2jt9Yeq50q1",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Billy Strasser",
+      "expertId": "recowokEH8Fg6vKNV",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Julie Cleveland",
+      "expertId": "recpt1bVfE28DzzSE",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Nick Greene",
+      "expertId": "recwHMRypHUpON4rs",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Dehn Craig",
+      "expertId": "recwQK8ChFXoX3JJ3",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    },
+    {
+      "name": "Dakota Walz",
+      "expertId": "recxXLjlK33SBCOCG",
+      "issues_count": 0,
+      "issues": [],
+      "changes_made": {},
+      "update_status": "no_changes"
+    }
+  ]
+}

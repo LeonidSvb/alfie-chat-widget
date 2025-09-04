@@ -1,0 +1,96 @@
+{
+  "generated_at": "2025-09-03T11:55:30.392Z",
+  "total_experts": 45,
+  "categories": {
+    "Location_Tags": {
+      "count": 31,
+      "tags": [
+        "country_australia",
+        "country_canada",
+        "country_indonesia",
+        "country_new_zealand",
+        "country_norway",
+        "country_peru",
+        "country_philippines",
+        "country_us",
+        "dest_andes",
+        "dest_bali",
+        "dest_cairns",
+        "dest_canyonlands",
+        "dest_cascades",
+        "dest_death_valley",
+        "dest_grand_canyon",
+        "dest_great_barrier_reef",
+        "dest_lofoten",
+        "dest_mt_rainier",
+        "dest_olympic",
+        "dest_patagonia",
+        "dest_sedona",
+        "dest_turks_caicos",
+        "dest_yellowstone",
+        "dest_yosemite",
+        "dest_zion",
+        "region_alaska",
+        "region_arizona",
+        "region_california",
+        "region_colorado",
+        "region_utah",
+        "region_washington"
+      ]
+    },
+    "Activity_Tags": {
+      "count": 10,
+      "tags": [
+        "activity_canyoning",
+        "activity_climbing",
+        "activity_diving",
+        "activity_hiking",
+        "activity_mountaineering",
+        "activity_photography",
+        "activity_skiing",
+        "activity_trail_running",
+        "activity_water_sports",
+        "activity_wildlife"
+      ]
+    },
+    "Traveler_Tags": {
+      "count": 5,
+      "tags": [
+        "traveler_60plus",
+        "traveler_beginners",
+        "traveler_extreme",
+        "traveler_families",
+        "traveler_solo"
+      ]
+    },
+    "Expertise_Tags": {
+      "count": 14,
+      "tags": [
+        "cert_avalanche",
+        "cert_wfr",
+        "level_advanced",
+        "level_beginner",
+        "level_extreme",
+        "role_guide",
+        "role_instructor",
+        "role_photographer",
+        "spec_backcountry",
+        "spec_canyon",
+        "spec_desert",
+        "spec_family",
+        "spec_mountain",
+        "spec_underwater"
+      ]
+    },
+    "Language_Tags": {
+      "count": 5,
+      "tags": [
+        "lang_english",
+        "lang_french",
+        "lang_german",
+        "lang_japanese",
+        "lang_spanish"
+      ]
+    }
+  }
+}
