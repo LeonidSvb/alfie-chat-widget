@@ -10,26 +10,21 @@ interface TripGuideLoadingProps {
   userDestination?: string;
 }
 
-// Travel facts from React project
+// TripGuide generation process messages
 const genericFacts = [
-  "🌍 Did you know? There are over 400 national parks worldwide!",
-  "🏔️ Mount Everest grows about 4mm each year due to geological forces.",
-  "🦊 Alfie has helped thousands of travelers discover their perfect outdoor adventures!",
-  "🌲 A single large tree can provide a day's supply of oxygen for up to two people.",
-  "🏕️ The word 'camping' comes from the Latin word 'campus' meaning field.",
-  "🥾 The average hiker burns about 400-700 calories per hour on trails.",
-  "🌊 Ocean waves can travel thousands of miles before reaching the shore.",
-  "⭐ In truly dark skies, you can see up to 2,500 stars with the naked eye.",
-  "🦎 Some desert animals never need to drink water - they get it all from their food!",
-  "🏂 Snow is actually 90% trapped air, making it an excellent insulator.",
-  "🐧 Antarctica is the world's largest desert - it's just covered in ice!",
-  "🌋 There are over 1,500 active volcanoes in the world today.",
-  "🦅 Golden eagles can spot prey from over 2 miles away.",
-  "🏞️ Yellowstone was the world's first national park, established in 1872.",
-  "🌿 Bamboo is the fastest-growing plant on Earth - some species grow 3 feet in 24 hours!",
-  "🦋 Monarch butterflies migrate up to 3,000 miles - that's like flying from New York to California!",
-  "🏕️ The northern lights are visible in both the Arctic and Antarctic - they're called aurora borealis in the north and aurora australis in the south.",
-  "🐻 Polar bears have black skin under their white fur to help absorb heat from the sun."
+  "🗺️ Unrolling the maps — plotting landscapes that fit your vibe.",
+  "🦌 Asking the rangers — picking up trail tips and secret spots.",
+  "🏘️ Checking the pulse of local towns — peeking at markets, festivals, and community favorites.",
+  "📚 Gathering the guides — outdoor experts worldwide sharing their tried-and-true adventures.",
+  "💎 Sifting through hidden gems — tapping into a deep well of expert knowledge.",
+  "⚡ Matching your energy level — finding outdoor experiences that keep pace with you.",
+  "🎭 Weaving in culture — adding authentic local flavors, stories, and traditions.",
+  "🌅 Spotting the scenic routes — choosing views worth slowing down for.",
+  "🌱 Keeping it sustainable — prioritizing eco-friendly and community-first activities.",
+  "⚖️ Balancing the days — mixing adventure with downtime.",
+  "✨ Stacking the highlights — making sure each day has a 'wow' moment to look forward to.",
+  "🌊 Layering culture and nature — weaving together trails, towns, and tastes in a natural flow.",
+  "📖 Checking the flow — making sure your journey unfolds like a story, not a checklist."
 ];
 
 // Destination-specific facts
@@ -213,7 +208,7 @@ export default function TripGuideLoading({
             letterSpacing: '0.8px',
             marginBottom: '8px'
           }}>
-            Did you know?
+            Creating your guide
           </div>
           
           {/* Fact Text - readable typography */}

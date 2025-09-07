@@ -92,7 +92,9 @@ export default function IKnowWhereFlow({ onComplete }: IKnowWhereFlowProps) {
     const mockTripGuide = {
       id: 'flow-1-email',
       title: 'Trip Planning',
+      content: 'Trip planning guide will be generated after email submission.',
       flowType: 'i-know-where' as const,
+      generatedAt: new Date(),
       questionnaireSummary: {},
       tags: ['flow-1']
     };

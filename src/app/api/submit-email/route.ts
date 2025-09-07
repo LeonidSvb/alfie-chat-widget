@@ -32,33 +32,33 @@ export async function POST(request: NextRequest): Promise<NextResponse<CRMSubmis
     // Map questionnaire data to GoHighLevel custom fields
     const questionnaire = body.questionnaireSummary;
     
-    // Extract and map fields based on common questionnaire structure
+    // Extract and map fields based on common questionnaire structure - ensure all fields have values
     const placeOfInterest = 
       questionnaire.regions_interest || 
       questionnaire.destination_main || 
       questionnaire.destination || 
-      '';
+      'Not specified';
 
     const travelerType = 
       questionnaire.party_type || 
       questionnaire.party_type_shared ||
       questionnaire.travel_party || 
-      '';
+      'Not specified';
 
     const activityLevel = 
       questionnaire.fitness_level || 
       questionnaire.fitness_level_shared ||
       questionnaire.activity_level || 
-      '';
+      'Not specified';
 
-    // Serialize activity arrays - include all possible activity fields
+    // Serialize activity arrays - include all possible activity fields, ensure always populated
     const activityPreferences = questionnaire.activities_interest || questionnaire.activities
       ? JSON.stringify(Array.isArray(questionnaire.activities_interest || questionnaire.activities) 
           ? (questionnaire.activities_interest || questionnaire.activities)
           : [questionnaire.activities_interest || questionnaire.activities])
-      : '';
+      : 'Not specified';
 
-    // Include travel_style and guided preferences
+    // Include travel_style and guided preferences, ensure always populated
     const guidedPreferences = 
       questionnaire.guided_preference || 
       questionnaire.guided_prefs || 
@@ -66,10 +66,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<CRMSubmis
       ? JSON.stringify(Array.isArray(questionnaire.guided_preference || questionnaire.guided_prefs) 
           ? (questionnaire.guided_preference || questionnaire.guided_prefs)
           : [questionnaire.guided_preference || questionnaire.guided_prefs || questionnaire.travel_style])
-      : '';
+      : 'Not specified';
 
-    const travelBudget = questionnaire.budget || questionnaire.budget_range || '';
-    const travelDates = questionnaire.travel_dates || questionnaire.when_travel || questionnaire.season_window_shared || '';
+    const travelBudget = questionnaire.budget || questionnaire.budget_range || 'Not specified';
+    const travelDates = questionnaire.travel_dates || questionnaire.when_travel || questionnaire.season_window_shared || 'Not specified';
 
     // Create GoHighLevel contact with only required fields
     const contact: GoHighLevelContact = {
