@@ -128,6 +128,66 @@ export default function SimpleTestPanel() {
     }
   };
 
+  const handleTestEmail = async () => {
+    setState(prev => ({ ...prev, isRunning: true }));
+    
+    const logger = testRegistry.getLogger();
+    
+    try {
+      const testEmailData = {
+        email: 'test@example.com',
+        firstName: 'Test',
+        lastName: 'User',
+        questionnaireSummary: { test: 'data' },
+        flowType: 'test',
+        tripGuideId: 'test-' + Date.now(),
+        tags: ['test-email'],
+        submittedAt: new Date()
+      };
+      
+      logger.info('simple-test', 'email_test_start', {
+        email: testEmailData.email,
+        flowType: testEmailData.flowType
+      });
+
+      const response = await fetch('/api/submit-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(testEmailData)
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok && result.success) {
+        logger.info('simple-test', 'email_test_success', {
+          contactId: result.contactId,
+          response: result
+        });
+      } else {
+        logger.error('simple-test', 'email_test_failed', {
+          error: result.error || 'Unknown error'
+        });
+      }
+
+      setState(prev => ({ 
+        ...prev, 
+        isRunning: false,
+        logs: logger.getLogs()
+      }));
+
+    } catch (error) {
+      logger.error('simple-test', 'email_test_error', {
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      
+      setState(prev => ({ 
+        ...prev, 
+        isRunning: false,
+        logs: logger.getLogs()
+      }));
+    }
+  };
+
   return (
     <div style={{ 
       width: '400px',
@@ -212,10 +272,10 @@ export default function SimpleTestPanel() {
             padding: '12px',
             marginBottom: '12px',
             borderRadius: '6px',
-            border: 'none',
-            background: state.isRunning ? '#6c757d' : '#28a745',
-            color: 'white',
-            fontWeight: 'bold',
+            border: '1px solid #9ca3af',
+            background: state.isRunning ? '#9ca3af' : '#f3f4f6',
+            color: state.isRunning ? 'white' : '#6b7280',
+            fontWeight: '500',
             cursor: state.isRunning ? 'not-allowed' : 'pointer',
             fontSize: '14px'
           }}
@@ -230,15 +290,34 @@ export default function SimpleTestPanel() {
             width: '100%',
             padding: '12px',
             borderRadius: '6px',
-            border: 'none',
-            background: state.isRunning ? '#6c757d' : '#007bff',
-            color: 'white',
-            fontWeight: 'bold',
+            border: '1px solid #9ca3af',
+            background: state.isRunning ? '#9ca3af' : '#f3f4f6',
+            color: state.isRunning ? 'white' : '#6b7280',
+            fontWeight: '500',
             cursor: state.isRunning ? 'not-allowed' : 'pointer',
             fontSize: '14px'
           }}
         >
           {state.isRunning ? '⏳ Generating...' : '🗺️ Test "I Know Where" Flow'}
+        </button>
+
+        <button
+          onClick={handleTestEmail}
+          disabled={state.isRunning}
+          style={{
+            width: '100%',
+            padding: '12px',
+            marginTop: '12px',
+            borderRadius: '6px',
+            border: '1px solid #9ca3af',
+            background: state.isRunning ? '#9ca3af' : '#f3f4f6',
+            color: state.isRunning ? 'white' : '#6b7280',
+            fontWeight: '500',
+            cursor: state.isRunning ? 'not-allowed' : 'pointer',
+            fontSize: '14px'
+          }}
+        >
+          📧 Test Email Submission
         </button>
       </div>
 

@@ -71,12 +71,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<CRMSubmis
     const travelBudget = questionnaire.budget || questionnaire.budget_range || '';
     const travelDates = questionnaire.travel_dates || questionnaire.when_travel || questionnaire.season_window_shared || '';
 
-    // Create GoHighLevel contact (using simplified interface)
+    // Create GoHighLevel contact with only required fields
     const contact: GoHighLevelContact = {
       email: body.email,
       firstName: body.firstName,
       lastName: body.lastName,
-      tags: ['tripguide-widget', body.flowType, ...body.tags],
       customFields: {
         planning_stage: body.flowType,
         place_of_interest: placeOfInterest,

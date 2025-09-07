@@ -1804,17 +1804,18 @@
 .alfie-chip {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border-radius: 25px;
-    font-size: 14px;
-    font-weight: 600;
-    border: 2px solid transparent;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid #d1d5db;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: default;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: #f3f4f6;
+    color: #6b7280;
     letter-spacing: 0.025em;
 }
 
@@ -1834,68 +1835,58 @@
 }
 
 .chip-triptype {
-    background: linear-gradient(135deg, var(--alfie-light-green), var(--alfie-dark-green));
-    color: var(--alfie-text);
-    border-color: var(--alfie-green);
-    box-shadow: 0 4px 12px rgba(74, 139, 92, 0.25);
+    background: #f3f4f6;
+    color: #6b7280;
+    border-color: #d1d5db;
 }
 
 .chip-triptype::before {
-    content: '🗺️';
-    font-size: 18px;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+    content: '📍';
+    font-size: 14px;
 }
 
 .chip-triplength {
-    background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
-    color: #4338ca;
-    border-color: #6366f1;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+    background: #f3f4f6;
+    color: #6b7280;
+    border-color: #d1d5db;
 }
 
 .chip-triplength::before {
-    content: '⏰';
-    font-size: 18px;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+    content: '⏱️';
+    font-size: 14px;
 }
 
 .chip-season {
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-    color: #d97706;
-    border-color: #f59e0b;
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+    background: #f3f4f6;
+    color: #6b7280;
+    border-color: #d1d5db;
 }
 
 .chip-season::before {
-    content: '🌸';
-    font-size: 18px;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+    content: '🌿';
+    font-size: 14px;
 }
 
 .chip-group {
-    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-    color: #1d4ed8;
-    border-color: #3b82f6;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+    background: #f3f4f6;
+    color: #6b7280;
+    border-color: #d1d5db;
 }
 
 .chip-group::before {
-    content: '👥';
-    font-size: 18px;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+    content: '👤';
+    font-size: 14px;
 }
 
 .chip-style {
-    background: linear-gradient(135deg, #fecaca, #fca5a5);
-    color: #dc2626;
-    border-color: #ef4444;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+    background: #f3f4f6;
+    color: #6b7280;
+    border-color: #d1d5db;
 }
 
 .chip-style::before {
-    content: '🎒';
-    font-size: 18px;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+    content: '⭐';
+    font-size: 14px;
 }
 
 /* ===== ACCORDION СИСТЕМА - Enhanced Alfie Style ===== */
@@ -2221,8 +2212,8 @@
     }
 
     .alfie-chip {
-        font-size: 13px;
-        padding: 6px 10px;
+        font-size: 11px;
+        padding: 4px 8px;
         gap: 4px;
     }
 
