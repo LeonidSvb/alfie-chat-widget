@@ -1,150 +1,222 @@
-# 🎯 Outdoorable TripGuide Widget - Complete Business Solution
+# Outdoorable TripGuide Widget - Project Documentation
 
-## What This Is
+## What This Project Is
 
-**A smart trip planning widget that turns website visitors into customers.** Your users answer a few questions, get a personalized outdoor adventure guide, and you capture their contact info for your business.
+This is a **Next.js-based interactive widget** that generates personalized trip guides using OpenAI. Users complete a questionnaire, AI creates custom recommendations, and their data gets saved to GoHighLevel CRM. The widget embeds as an iframe on any website.
 
-**Simple**: Embeds on any website in 2 minutes  
-**Smart**: Uses AI to create custom trip recommendations  
-**Profitable**: Converts browsers into leads and customers  
+## Project Structure
 
----
+### Root Files
+- `next.config.js` - **Critical file** that allows iframe embedding on any website
+- `package.json` - Dependencies: Next.js, OpenAI, Airtable, GoHighLevel clients
+- `.env.local` - API keys (OpenAI, GoHighLevel, Airtable)
+- `CHANGELOG.md` - Version history and feature updates
+- `tsconfig.json` - TypeScript configuration
 
-## 💰 Business Benefits
+### Core Application (`src/app/`)
+- **`page.tsx`** - Main widget entry point, handles all user flows and state
+- **`layout.tsx`** - App wrapper with meta tags and responsive setup
+- **`api/`** - Next.js API routes:
+  - `generate-trip-guide/route.ts` - Calls OpenAI to create trip guides
+  - `submit-email/route.ts` - Saves user data to GoHighLevel CRM
+  - `match-expert/route.ts` - Finds matching experts from Airtable
+  - `test-ghl-fields/route.ts` - Tests GoHighLevel integration
 
-### For Your Website Visitors
-✅ **Get personalized trip advice** - No generic recommendations  
-✅ **Save hours of research** - AI does the planning for them  
-✅ **Discover hidden gems** - Unique spots they wouldn't find alone  
-✅ **Works on mobile** - Perfect experience on any device  
-✅ **Instant results** - Trip guide ready in 30 seconds  
+### Components (`src/components/`)
+- **Questionnaire flows:**
+  - `FlowSelector.tsx` - Choose "Inspire Me" or "I Know Where" path
+  - `InspireMeFlow.tsx` - Questions for destination inspiration
+  - `IKnowWhereFlow.tsx` - Questions for specific destination planning
+  - `QuestionCard.tsx` - Individual question component
+  - `ProgressBar.tsx` - Shows completion progress
 
-### For Your Business
-✅ **Capture quality leads** - People engaged enough to complete questionnaire  
-✅ **Increase website engagement** - Interactive experience keeps visitors longer  
-✅ **Build email list** - Natural way to collect contact information  
-✅ **Stand out from competition** - Unique value proposition  
-✅ **Works everywhere** - Embed on any website, social media, emails  
+- **Trip Guide display:**
+  - `TripGuideDisplay.tsx` - Shows generated trip guide
+  - `TripGuideLoading.tsx` - Loading animation while AI generates
+  - `AIContentRenderer.tsx` - Formats AI-generated content
+  - `EmailGatedTripGuide.tsx` - Collects email before showing full guide
+  - `TripGuideChips.tsx` - Tag display for trip categories
 
----
+- **Other components:**
+  - `WidgetContainer.tsx` - Main widget wrapper with theming
+  - `ExpertMatching.tsx` - Shows matched experts from database
+  - `InlineEmailGate.tsx` - Email collection component
 
-## 🚀 What Makes This Special
+### Business Logic (`src/lib/`)
+- **`tripGuideGenerator.ts`** - **Main AI logic**: calls OpenAI with prompts, handles retries, generates trip guides
+- **`gohighlevel.ts`** - **CRM integration**: saves leads to GoHighLevel with custom fields
+- **`airtable.ts`** - Expert database connection for matching users with guides
+- **`openai.ts`** - OpenAI client configuration and models
+- **`embedUtils.ts`** - Iframe embedding utilities (height adjustment, messaging)
+- **`expertMatcher.ts`** - Algorithms to match users with relevant experts
+- **`emailAnalytics.ts`** - Tracks email submissions and conversions
 
-### 1. **Two Smart Flows**
-- **"Inspire Me"** - For dreamers who want destination ideas
-- **"I Know Where I'm Going"** - For planners who need activity recommendations
+### Test Mode (`src/test-mode/`)
+- **`TestModeWrapper.tsx`** - Test interface (access with `?TestMod=1`)
+- **`registry.ts`** - Test scenarios and fixtures
+- **`SimpleTestPanel.tsx`** - Quick testing interface
+- **`__tests__/`** - Automated tests for all flows
 
-### 2. **AI-Powered Personalization**
-- Analyzes user preferences (budget, experience level, interests)
-- Creates custom recommendations using OpenAI
-- Matches users with expert guides from your database
-- Generates detailed trip guides with activities, tips, and local insights
+### Types (`src/types/`)
+- `questionnaire.ts` - Question and flow type definitions
+- `tripGuide.ts` - Trip guide data structure
+- `expert.ts` - Expert profile types
+- `widget.ts` - Widget configuration types
+- `crm.ts` - GoHighLevel data types
 
-### 3. **Lead Generation Engine**
-- Natural email collection ("Get your trip guide sent to email")
-- Integrates with GoHighLevel CRM automatically
-- Captures user preferences for follow-up marketing
-- Segments leads based on trip interests
+## How It Works
 
-### 4. **Universal Embedding**
-- **Works on any website** - Webflow, WordPress, Shopify, custom sites
-- **Mobile responsive** - Perfect on phones, tablets, desktops
-- **Fast loading** - Under 2 seconds anywhere in the world
-- **No technical skills needed** - Just copy/paste embed code
+### User Flow
+1. **User sees widget** on host website (embedded via iframe)
+2. **Selects flow**: "Inspire Me" (need destination ideas) or "I Know Where" (have destination)
+3. **Answers questions**: 3-7 questions about budget, interests, experience level
+4. **AI generates guide**: Uses OpenAI with custom prompts (30 seconds)
+5. **Email collection**: User provides email to get full guide
+6. **Data saved**: Contact automatically added to GoHighLevel CRM with preferences
+7. **Expert matching**: System suggests relevant experts from Airtable database
 
----
+### Key Technical Functions
 
-## 📊 ROI Impact
+#### `tripGuideGenerator.ts`
+- `generateInspireGuide()` - Creates destination inspiration using OpenAI
+- `generatePlanningGuide()` - Creates detailed trip plans for known destinations  
+- `generateTags()` - Creates tags for expert matching
+- Includes retry logic for API failures and rate limiting
 
-### What You Get
-- **Higher conversion rates** - Interactive experience vs static content
-- **Better quality leads** - Pre-qualified by their responses
-- **Increased time on site** - Visitors engage for 2-5 minutes
-- **Competitive advantage** - Unique tool your competitors don't have
-- **Automated lead nurturing** - Instant CRM integration
+#### `gohighlevel.ts`  
+- `createContact()` - Saves user data to CRM with custom fields
+- Handles GoHighLevel V1 API format (customField object, not array)
+- Includes error handling and manual logging if API fails
 
-### What It Replaces
-- ❌ Static "Contact Us" forms (boring, low conversion)
-- ❌ Generic travel content (doesn't engage visitors)
-- ❌ Manual lead qualification (time-intensive)
-- ❌ Separate tools for different websites (complicated)
+#### `next.config.js` - Iframe Embedding
+```javascript
+headers: [
+  {
+    key: 'Content-Security-Policy',
+    value: "frame-ancestors *;"  // Allows embedding on ANY domain
+  }
+]
+```
 
----
+## Why N8N Cannot Do This
 
-## 🛠️ How It Works (Simple Version)
+### Technical Limitations of N8N:
+1. **No HTTP headers control** - Cannot set `Content-Security-Policy` or `X-Frame-Options`
+2. **No iframe capability** - Cannot create embeddable widgets that work across domains  
+3. **No frontend rendering** - Cannot display interactive React components
+4. **Webhook limitations** - Would require proxy servers, adding complexity and cost
+5. **No state management** - Cannot handle multi-step user flows with progress tracking
 
-1. **User visits your website** → Sees the widget
-2. **Picks their flow** → "Inspire Me" or "I Know Where"
-3. **Answers 3-7 questions** → About budget, interests, experience
-4. **AI generates trip guide** → Personalized recommendations in 30 seconds
-5. **User enters email** → To receive full guide
-6. **You get the lead** → Automatically added to your CRM with all preferences
+### What N8N Can Do vs. What This Project Does:
+| Feature | N8N | This Project |
+|---------|-----|-------------|
+| API integrations | ✅ | ✅ |
+| Data workflows | ✅ | ✅ |
+| Interactive UI | ❌ | ✅ |
+| Iframe embedding | ❌ | ✅ |
+| Real-time user interaction | ❌ | ✅ |
+| Custom React components | ❌ | ✅ |
+| Cross-domain embedding | ❌ | ✅ |
 
----
+**Bottom line**: N8N handles backend workflows, but cannot create interactive, embeddable user interfaces.
 
-## 🎯 Perfect For
+## Environment Setup
 
-- **Travel companies** - Capture leads with personalized recommendations
-- **Outdoor gear retailers** - Suggest products based on planned activities
-- **Tour operators** - Pre-qualify customers and match them to tours
-- **Travel bloggers** - Monetize content with interactive tools
-- **Adventure guides** - Showcase expertise and capture bookings
+### Required Environment Variables (`.env.local`)
+```
+OPENAI_API_KEY=your_openai_key_here
+GOHIGHLEVEL_API_KEY=your_ghl_key_here  
+GOHIGHLEVEL_LOCATION_ID=your_location_id_here
+AIRTABLE_API_KEY=your_airtable_key_here
+AIRTABLE_BASE_ID=your_base_id_here
+```
 
----
+### Installation & Launch
+```bash
+# Install dependencies
+npm install
 
-## 📱 Technical Highlights (Non-Nerdy)
+# Run development server
+npm run dev
 
-### Reliability
-- **99.9% uptime** - Hosted on enterprise infrastructure
-- **Global fast loading** - Works instantly worldwide
-- **Mobile optimized** - Perfect experience on any device
-- **Browser compatible** - Works on Chrome, Safari, Firefox, Edge
+# Build for production  
+npm run build
+npm start
 
-### Integration
-- **Easy embed** - One line of code on any website
-- **CRM connected** - Automatic lead capture to GoHighLevel
-- **Customizable** - Match your brand colors and style
-- **Analytics ready** - Track conversions and user behavior
+# Run tests
+npm test
 
-### Security & Performance
-- **Secure data** - All user information encrypted
-- **Fast AI** - Trip guides generated in under 30 seconds
-- **Scalable** - Handles thousands of concurrent users
-- **No maintenance** - We handle updates and improvements
+# Test mode (in browser)
+http://localhost:3000/?TestMod=1
+```
 
----
+## Deployment
 
-## 🏆 Investment Value
+### Current Setup
+- **Hosting**: Vercel (automatic deployment from GitHub)
+- **Domain**: Links to production URL
+- **Embedding**: Works on Webflow, WordPress, Shopify, any HTML site
 
-### What You're Getting
-- ✅ **Complete lead generation system** ($5,000+ value)
-- ✅ **AI-powered personalization engine** ($3,000+ value)
-- ✅ **Universal website integration** ($2,000+ value)
-- ✅ **CRM automation setup** ($1,000+ value)
-- ✅ **Mobile-responsive design** ($1,500+ value)
-- ✅ **Ongoing hosting and maintenance** ($500/month value)
+### Embed Code
+```html
+<iframe 
+  src="https://your-domain.vercel.app/?embedded=true&theme=light" 
+  width="100%" 
+  height="600" 
+  frameborder="0">
+</iframe>
+```
 
-**Total Value**: $12,500+ for a one-time investment
+### Vercel Deployment
+1. Connected to GitHub repository
+2. Automatic deployments on `git push`
+3. Environment variables configured in Vercel dashboard
+4. Custom domain configured if needed
 
-### Immediate Benefits
-- Start capturing leads within hours of installation
-- Differentiate from competitors immediately
-- Reduce manual lead qualification work
-- Increase website engagement and time-on-site
-- Build email list with high-intent prospects
+## Key Files You Need to Know
 
----
+### Must Understand Files:
+1. **`next.config.js`** - Makes iframe embedding work (CSP headers)
+2. **`src/app/page.tsx`** - Main application logic and user flow
+3. **`src/lib/tripGuideGenerator.ts`** - AI trip guide creation
+4. **`src/lib/gohighlevel.ts`** - CRM integration
+5. **`src/components/Questionnaire/FlowSelector.tsx`** - User journey starts here
 
-## 🚦 Ready to Launch
+### Configuration Files:
+1. **`.env.local`** - API keys and secrets
+2. **`package.json`** - Dependencies and scripts  
+3. **`tsconfig.json`** - TypeScript settings
 
-✅ **Fully tested and working**  
-✅ **Mobile responsive**  
-✅ **CRM integrated**  
-✅ **AI optimized**  
-✅ **Ready for any website**  
+### Testing:
+1. **`src/test-mode/`** - Test interface (`?TestMod=1`)
+2. **`src/__tests__/`** - Automated tests
 
-**Next Step**: Just give us your website URL and brand colors - we'll have you up and running in under 24 hours.
+## Common Issues & Solutions
 
----
+### Embedding Problems
+- **Issue**: Widget not loading in iframe
+- **Solution**: Check `next.config.js` CSP headers, ensure `frame-ancestors *`
 
-*This isn't just a widget - it's a complete lead generation and customer experience system that transforms how your visitors interact with your business.*
+### API Failures  
+- **Issue**: OpenAI or GoHighLevel errors
+- **Solution**: Check API keys in `.env.local`, verify rate limits
+
+### Development Issues
+- **Issue**: Build failures
+- **Solution**: Run `npm install`, check Node.js version (16+)
+
+## Project Value
+
+This project combines:
+- ✅ Interactive React frontend with multi-step flows
+- ✅ AI integration (OpenAI) for content generation  
+- ✅ CRM integration (GoHighLevel) for lead capture
+- ✅ Database integration (Airtable) for expert matching
+- ✅ Universal embedding capability (works anywhere)
+- ✅ Mobile responsive design
+- ✅ Test mode for easy QA
+- ✅ Production-ready deployment pipeline
+
+**Technical complexity**: Handles cross-domain embedding, AI API integration, CRM automation, responsive design, error handling, and performance optimization - all in a single embeddable widget.
+
+**Business impact**: Converts website visitors into qualified leads through interactive experience, with automatic CRM integration and expert matching.
