@@ -12,7 +12,7 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "frame-ancestors 'self' *.webflow.com *.webflow.io;",
+            value: "frame-ancestors *;",
           },
         ],
       },
