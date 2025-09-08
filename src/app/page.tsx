@@ -17,7 +17,7 @@ type AppState = 'flow-selection' | 'questionnaire' | 'generating' | 'results';
 export default function HomePage({
   searchParams
 }: {
-  searchParams?: { theme?: string; maxWidth?: string; embedded?: string; debug?: string }
+  searchParams?: { theme?: string; maxWidth?: string; embedded?: string; debug?: string; TestMod?: string }
 }) {
   const [appState, setAppState] = useState<AppState>('flow-selection');
   const [selectedFlow, setSelectedFlow] = useState<FlowType | null>(null);

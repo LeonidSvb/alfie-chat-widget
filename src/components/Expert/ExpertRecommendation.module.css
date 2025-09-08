@@ -1,0 +1,202 @@
+.alfieExpertRecommendation {
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  margin: 24px 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 2px solid var(--alfie-dark-green, #D4EDD4);
+}
+
+.alfieRecommendationHeader {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.alfieRecommendationTitle {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--alfie-text, #2E4B3E);
+  margin: 0 0 16px 0;
+  line-height: 1.2;
+}
+
+.alfieRecommendationDescription {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--alfie-text-light, #4A6741);
+  margin: 0 0 20px 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.alfieRecommendationPrice {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--alfie-text, #2E4B3E);
+  margin: 0;
+}
+
+.alfieExpertPicksSection {
+  border-top: 2px solid var(--alfie-dark-green, #D4EDD4);
+  padding-top: 24px;
+}
+
+.alfieExpertPicksHeader {
+  background: var(--alfie-green, #4A8B5C);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 24px;
+  display: inline-block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.alfieExpertsGrid {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.alfieExpertsCount1 {
+  justify-content: center;
+}
+
+.alfieExpertsCount2 .alfieExpertPickCard {
+  flex: 1;
+  max-width: 300px;
+}
+
+.alfieExpertsCount3 .alfieExpertPickCard {
+  flex: 1;
+  max-width: 250px;
+}
+
+.alfieExpertPickCard {
+  background: #fafafa;
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  border: 2px solid var(--alfie-dark-green, #D4EDD4);
+  min-width: 200px;
+}
+
+.alfieExpertAvatar {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--alfie-green, #4A8B5C);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--alfie-dark-green, #D4EDD4);
+}
+
+.alfieExpertAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.alfieExpertAvatarPlaceholder {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--alfie-green, #4A8B5C);
+}
+
+.alfieExpertInfo {
+  text-align: center;
+}
+
+.alfieExpertName {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--alfie-text, #2E4B3E);
+  margin: 0 0 4px 0;
+}
+
+.alfieExpertProfession {
+  font-size: 14px;
+  color: var(--alfie-text-light, #4A6741);
+  margin: 0 0 4px 0;
+}
+
+.alfieExpertLocation {
+  font-size: 14px;
+  color: var(--alfie-text-light, #4A6741);
+  margin: 0 0 16px 0;
+}
+
+.alfieTalkToExpertBtn {
+  background: transparent;
+  color: var(--alfie-green, #4A8B5C);
+  border: 2px solid var(--alfie-green, #4A8B5C);
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: underline;
+  font-family: inherit;
+}
+
+.alfieTalkToExpertBtn:hover {
+  background: var(--alfie-green, #4A8B5C);
+  color: white;
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .alfieExpertRecommendation {
+    padding: 24px;
+    margin: 16px 0;
+  }
+
+  .alfieRecommendationTitle {
+    font-size: 24px;
+  }
+
+  .alfieRecommendationDescription {
+    font-size: 15px;
+  }
+
+  .alfieExpertsGrid {
+    flex-direction: column;
+  }
+
+  .alfieExpertsCount2 .alfieExpertPickCard,
+  .alfieExpertsCount3 .alfieExpertPickCard {
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .alfieExpertRecommendation {
+    padding: 20px;
+  }
+
+  .alfieRecommendationTitle {
+    font-size: 22px;
+  }
+
+  .alfieExpertPickCard {
+    padding: 20px;
+  }
+
+  .alfieExpertAvatar {
+    width: 70px;
+    height: 70px;
+  }
+
+  .alfieExpertName {
+    font-size: 18px;
+  }
+}

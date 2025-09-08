@@ -101,51 +101,15 @@ export default function TripGuideLoading({
       </div>
 
       {/* Alfie Avatar with consistent styling */}
-      <div style={{ 
-        position: 'relative',
-        width: '80px',
-        height: '80px',
-        margin: '0 auto 25px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
+      <div className="alfie-loading-avatar-container">
         {/* Main spinning border - matching progress bar style */}
-        <div 
-          style={{
-            position: 'absolute',
-            width: '80px',
-            height: '80px',
-            borderRadius: '50%',
-            border: '3px solid var(--alfie-dark-green)',
-            borderTop: '3px solid var(--alfie-green)',
-            animation: 'spin 1s linear infinite'
-          }}
-        />
+        <div className="alfie-loading-spinner-outer" />
         
         {/* Secondary ring for depth */}
-        <div 
-          style={{
-            position: 'absolute',
-            width: '68px',
-            height: '68px',
-            borderRadius: '50%',
-            border: '1px solid var(--alfie-orange)',
-            opacity: 0.6,
-            animation: 'pulse 2s ease-in-out infinite'
-          }}
-        />
+        <div className="alfie-loading-spinner-inner" />
         
         {/* Alfie Avatar - matching main widget sizing */}
-        <div style={{
-          width: '60px',
-          height: '60px',
-          borderRadius: '50%',
-          overflow: 'hidden',
-          border: '2px solid white',
-          background: 'white',
-          boxShadow: '0 2px 8px rgba(74, 139, 92, 0.2)'
-        }}>
+        <div className="alfie-loading-avatar">
           <Image
             src="/images/alfie-avatar.png"
             alt="Alfie Avatar"
@@ -250,6 +214,69 @@ export default function TripGuideLoading({
 
       {/* CSS animations - matching existing styles */}
       <style jsx>{`
+        .alfie-loading-avatar-container {
+          position: relative;
+          width: 80px;
+          height: 80px;
+          margin: 0 auto 25px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .alfie-loading-spinner-outer {
+          position: absolute;
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          border: 3px solid var(--alfie-dark-green);
+          border-top: 3px solid var(--alfie-green);
+          animation: spin 1s linear infinite;
+        }
+        
+        .alfie-loading-spinner-inner {
+          position: absolute;
+          width: 68px;
+          height: 68px;
+          border-radius: 50%;
+          border: 1px solid var(--alfie-orange);
+          opacity: 0.6;
+          animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .alfie-loading-avatar {
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          overflow: hidden;
+          border: 2px solid white;
+          background: white;
+          box-shadow: 0 2px 8px rgba(74, 139, 92, 0.2);
+        }
+        
+        /* Mobile responsive - только размеры контейнера и спиннера, аватарка остается 60px */
+        @media (max-width: 480px) {
+          .alfie-loading-avatar-container {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 20px;
+          }
+          
+          .alfie-loading-spinner-outer {
+            width: 60px;
+            height: 60px;
+            border: 2px solid var(--alfie-dark-green);
+            border-top: 2px solid var(--alfie-green);
+          }
+          
+          .alfie-loading-spinner-inner {
+            width: 50px;
+            height: 50px;
+          }
+          
+          /* Аватарка остается 60px как на десктопе */
+        }
+        
         @keyframes spin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }

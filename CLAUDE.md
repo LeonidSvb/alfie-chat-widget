@@ -120,3 +120,6 @@
 - Ensure all test scenarios pass successfully
 - If any test fails, address the issue immediately before proceeding
 - Document test results and maintain test coverage for future changes
+
+
+Where it is possible to make massive batches First, see what needs to be changed, and then change everything massively to make it as fast as possible. 

@@ -6,6 +6,7 @@ export const airtable = new Airtable({
 }).base(process.env.AIRTABLE_BASE_ID!);
 
 const EXPERTS_TABLE = 'tblsSB9gBBFhH2qci';
+const EXPERT_DESTINATIONS_TABLE = 'tblGzWR1aYpAssoOP';
 
 export async function queryExperts(tags: string[]): Promise<Expert[]> {
   try {
@@ -56,6 +57,66 @@ export async function getAllExperts(): Promise<Expert[]> {
   } catch (error) {
     console.error('Error getting all experts from Airtable:', error);
     return getMockExperts();
+  }
+}
+
+export async function getAllExpertDestinations() {
+  try {
+    const records = await airtable(EXPERT_DESTINATIONS_TABLE).select({
+      maxRecords: 1000,
+    }).all();
+
+    return records.map(record => ({
+      id: record.id,
+      expertId: record.get('Expert ID') || record.get('Expert') || '',
+      expertName: record.get('Expert Name') || record.get('Author Name') || '',
+      country: record.get('Country') || '',
+      region: record.get('Region') || '',
+      subRegion: record.get('Sub-Region') || '',
+      city: record.get('City') || '',
+      specificLocation: record.get('Specific Location') || '',
+      createdAt: record.createdTime ? new Date(record.createdTime) : undefined,
+      ...record.fields
+    }));
+  } catch (error) {
+    console.error('Error getting expert destinations from Airtable:', error);
+    return [];
+  }
+}
+
+export async function debugAirtableTables() {
+  try {
+    console.log('=== DEBUGGING AIRTABLE TABLES ===');
+    
+    // Get experts table
+    const expertsRecords = await airtable(EXPERTS_TABLE).select({ maxRecords: 5 }).all();
+    console.log('Experts table sample:');
+    expertsRecords.forEach(record => {
+      console.log('Expert ID:', record.id);
+      console.log('Fields:', Object.keys(record.fields));
+      console.log('Sample data:', record.fields);
+      console.log('---');
+    });
+
+    // Get destinations table  
+    const destinationsRecords = await airtable(EXPERT_DESTINATIONS_TABLE).select({ maxRecords: 5 }).all();
+    console.log('Destinations table sample:');
+    destinationsRecords.forEach(record => {
+      console.log('Destination ID:', record.id);
+      console.log('Fields:', Object.keys(record.fields));
+      console.log('Sample data:', record.fields);
+      console.log('---');
+    });
+
+    return {
+      expertsCount: expertsRecords.length,
+      destinationsCount: destinationsRecords.length,
+      expertsFields: expertsRecords[0] ? Object.keys(expertsRecords[0].fields) : [],
+      destinationsFields: destinationsRecords[0] ? Object.keys(destinationsRecords[0].fields) : []
+    };
+  } catch (error) {
+    console.error('Error debugging Airtable tables:', error);
+    return { error: error.message };
   }
 }
 

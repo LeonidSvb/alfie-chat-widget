@@ -43,3 +43,11 @@ export interface ExpertMatchingProps {
   userTags?: string[];
   onExpertFound?: (expert: Expert) => void;
 }
+
+export interface ExpertRecommendationProps {
+  experts: Expert[];
+  title?: string;
+  description?: string;
+  price?: string;
+  onExpertClick?: (expert: Expert) => void;
+}

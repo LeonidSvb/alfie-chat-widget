@@ -99,17 +99,19 @@ export default function EmailGatedTripGuide({
     const sections: ParsedSection[] = [];
     
     if (tripGuide.flowType === 'inspire-me') {
-      // Parse Adventure Ideas for inspire-me
+      // Parse Adventure Ideas for inspire-me - more flexible pattern matching
       let i = 0;
       while (i < lines.length) {
         const line = lines[i];
-        if (/^🏞️\s*Adventure Idea \d+:/.test(line)) {
+        // Match various formats: "🏞️ Adventure Idea 1:", "Adventure Idea 1:", "🏞️Adventure Idea 1", etc.
+        if (/(?:🏞️\s*)?Adventure\s*Idea\s*\d+[:\.]?/i.test(line)) {
           const title = line;
           const key = title.toLowerCase().replace(/[^a-z0-9]+/gi, '-');
           const bodyLines: string[] = [];
           i++;
           
-          while (i < lines.length && !/^🏞️\s*Adventure Idea \d+:/.test(lines[i])) {
+          // Continue until we hit another Adventure Idea or end of content
+          while (i < lines.length && !/(?:🏞️\s*)?Adventure\s*Idea\s*\d+[:\.]?/i.test(lines[i])) {
             bodyLines.push(lines[i]);
             i++;
           }
