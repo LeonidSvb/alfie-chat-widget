@@ -84,6 +84,14 @@
 - Create reusable client utilities in `src/lib/`
 - Handle API errors gracefully with proper fallbacks
 
+### Airtable MCP Integration
+- **Primary Method**: Use official MCP server via NPX (`npx -y airtable-mcp-server`)
+- **Installation**: Server is installed and ready - no local files needed
+- **Security**: API keys stored in environment variables, never transmitted externally
+- **Architecture**: Local MCP server communicates directly with Airtable API
+- **Capabilities**: Full CRUD operations, schema inspection, search, and table management
+- **Usage**: Configure in Claude Desktop/Cursor with AIRTABLE_API_KEY environment variable
+
 ## Widget-Specific Considerations
 
 ### Embedding
@@ -123,3 +131,6 @@
 
 
 Where it is possible to make massive batches First, see what needs to be changed, and then change everything massively to make it as fast as possible. 
+
+
+When you test, run localhost randomly from 3000 to 6000. Maximum randomly. And when you finish testing, close unused ports so that they don't accumulate. 

@@ -75,7 +75,7 @@ export async function getAllExpertDestinations() {
       subRegion: record.get('Sub-Region') || '',
       city: record.get('City') || '',
       specificLocation: record.get('Specific Location') || '',
-      createdAt: record.createdTime ? new Date(record.createdTime) : undefined,
+      createdAt: (record as any).createdTime ? new Date((record as any).createdTime) : undefined,
       ...record.fields
     }));
   } catch (error) {

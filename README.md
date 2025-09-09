@@ -1,222 +1,222 @@
-# Outdoorable TripGuide Widget - Project Documentation
+# Outdoorable TripGuide Widget - Handoff Documentation
 
-## What This Project Is
+## Project Overview
 
-This is a **Next.js-based interactive widget** that generates personalized trip guides using OpenAI. Users complete a questionnaire, AI creates custom recommendations, and their data gets saved to GoHighLevel CRM. The widget embeds as an iframe on any website.
+Interactive Next.js widget that generates personalized trip guides using AI. Users complete questionnaires, receive custom recommendations, and get automatically added to GoHighLevel CRM. Embeds as iframe on any website.
 
-## Project Structure
+## 1. Code & Hosting
 
-### Root Files
-- `next.config.js` - **Critical file** that allows iframe embedding on any website
-- `package.json` - Dependencies: Next.js, OpenAI, Airtable, GoHighLevel clients
-- `.env.local` - API keys (OpenAI, GoHighLevel, Airtable)
-- `CHANGELOG.md` - Version history and feature updates
-- `tsconfig.json` - TypeScript configuration
+### GitHub Repository
+- Full commit history included
+- Transfer to `ali@outdoorable.co` organization
+- Repository: https://github.com/[current-org]/outdoor-next-js
 
-### Core Application (`src/app/`)
-- **`page.tsx`** - Main widget entry point, handles all user flows and state
-- **`layout.tsx`** - App wrapper with meta tags and responsive setup
-- **`api/`** - Next.js API routes:
-  - `generate-trip-guide/route.ts` - Calls OpenAI to create trip guides
-  - `submit-email/route.ts` - Saves user data to GoHighLevel CRM
-  - `match-expert/route.ts` - Finds matching experts from Airtable
-  - `test-ghl-fields/route.ts` - Tests GoHighLevel integration
-
-### Components (`src/components/`)
-- **Questionnaire flows:**
-  - `FlowSelector.tsx` - Choose "Inspire Me" or "I Know Where" path
-  - `InspireMeFlow.tsx` - Questions for destination inspiration
-  - `IKnowWhereFlow.tsx` - Questions for specific destination planning
-  - `QuestionCard.tsx` - Individual question component
-  - `ProgressBar.tsx` - Shows completion progress
-
-- **Trip Guide display:**
-  - `TripGuideDisplay.tsx` - Shows generated trip guide
-  - `TripGuideLoading.tsx` - Loading animation while AI generates
-  - `AIContentRenderer.tsx` - Formats AI-generated content
-  - `EmailGatedTripGuide.tsx` - Collects email before showing full guide
-  - `TripGuideChips.tsx` - Tag display for trip categories
-
-- **Other components:**
-  - `WidgetContainer.tsx` - Main widget wrapper with theming
-  - `ExpertMatching.tsx` - Shows matched experts from database
-  - `InlineEmailGate.tsx` - Email collection component
-
-### Business Logic (`src/lib/`)
-- **`tripGuideGenerator.ts`** - **Main AI logic**: calls OpenAI with prompts, handles retries, generates trip guides
-- **`gohighlevel.ts`** - **CRM integration**: saves leads to GoHighLevel with custom fields
-- **`airtable.ts`** - Expert database connection for matching users with guides
-- **`openai.ts`** - OpenAI client configuration and models
-- **`embedUtils.ts`** - Iframe embedding utilities (height adjustment, messaging)
-- **`expertMatcher.ts`** - Algorithms to match users with relevant experts
-- **`emailAnalytics.ts`** - Tracks email submissions and conversions
-
-### Test Mode (`src/test-mode/`)
-- **`TestModeWrapper.tsx`** - Test interface (access with `?TestMod=1`)
-- **`registry.ts`** - Test scenarios and fixtures
-- **`SimpleTestPanel.tsx`** - Quick testing interface
-- **`__tests__/`** - Automated tests for all flows
-
-### Types (`src/types/`)
-- `questionnaire.ts` - Question and flow type definitions
-- `tripGuide.ts` - Trip guide data structure
-- `expert.ts` - Expert profile types
-- `widget.ts` - Widget configuration types
-- `crm.ts` - GoHighLevel data types
-
-## How It Works
-
-### User Flow
-1. **User sees widget** on host website (embedded via iframe)
-2. **Selects flow**: "Inspire Me" (need destination ideas) or "I Know Where" (have destination)
-3. **Answers questions**: 3-7 questions about budget, interests, experience level
-4. **AI generates guide**: Uses OpenAI with custom prompts (30 seconds)
-5. **Email collection**: User provides email to get full guide
-6. **Data saved**: Contact automatically added to GoHighLevel CRM with preferences
-7. **Expert matching**: System suggests relevant experts from Airtable database
-
-### Key Technical Functions
-
-#### `tripGuideGenerator.ts`
-- `generateInspireGuide()` - Creates destination inspiration using OpenAI
-- `generatePlanningGuide()` - Creates detailed trip plans for known destinations  
-- `generateTags()` - Creates tags for expert matching
-- Includes retry logic for API failures and rate limiting
-
-#### `gohighlevel.ts`  
-- `createContact()` - Saves user data to CRM with custom fields
-- Handles GoHighLevel V1 API format (customField object, not array)
-- Includes error handling and manual logging if API fails
-
-#### `next.config.js` - Iframe Embedding
-```javascript
-headers: [
-  {
-    key: 'Content-Security-Policy',
-    value: "frame-ancestors *;"  // Allows embedding on ANY domain
-  }
-]
-```
-
-## Why N8N Cannot Do This
-
-### Technical Limitations of N8N:
-1. **No HTTP headers control** - Cannot set `Content-Security-Policy` or `X-Frame-Options`
-2. **No iframe capability** - Cannot create embeddable widgets that work across domains  
-3. **No frontend rendering** - Cannot display interactive React components
-4. **Webhook limitations** - Would require proxy servers, adding complexity and cost
-5. **No state management** - Cannot handle multi-step user flows with progress tracking
-
-### What N8N Can Do vs. What This Project Does:
-| Feature | N8N | This Project |
-|---------|-----|-------------|
-| API integrations | ✅ | ✅ |
-| Data workflows | ✅ | ✅ |
-| Interactive UI | ❌ | ✅ |
-| Iframe embedding | ❌ | ✅ |
-| Real-time user interaction | ❌ | ✅ |
-| Custom React components | ❌ | ✅ |
-| Cross-domain embedding | ❌ | ✅ |
-
-**Bottom line**: N8N handles backend workflows, but cannot create interactive, embeddable user interfaces.
-
-## Environment Setup
-
-### Required Environment Variables (`.env.local`)
-```
-OPENAI_API_KEY=your_openai_key_here
-GOHIGHLEVEL_API_KEY=your_ghl_key_here  
-GOHIGHLEVEL_LOCATION_ID=your_location_id_here
-AIRTABLE_API_KEY=your_airtable_key_here
-AIRTABLE_BASE_ID=your_base_id_here
-```
-
-### Installation & Launch
+### Local Development
 ```bash
-# Install dependencies
-npm install
-
-# Run development server
-npm run dev
-
-# Build for production  
-npm run build
-npm start
-
-# Run tests
-npm test
-
-# Test mode (in browser)
-http://localhost:3000/?TestMod=1
+pnpm install
+pnpm dev      # Starts on http://localhost:3000
+pnpm build    # Production build
+pnpm start    # Runs production build
 ```
 
-## Deployment
+### Vercel Deployment
+- Project linked to GitHub repository
+- Auto-deployment on git push to main
+- Transfer project to client Vercel account
+- Domain: [production-url].vercel.app
 
-### Current Setup
-- **Hosting**: Vercel (automatic deployment from GitHub)
-- **Domain**: Links to production URL
-- **Embedding**: Works on Webflow, WordPress, Shopify, any HTML site
+## 2. Environment Variables & Secrets
 
-### Embed Code
+### Required .env.example
+```
+# OpenAI Integration
+OPENAI_API_KEY=sk-your-openai-key-here
+
+# GoHighLevel CRM
+GOHIGHLEVEL_API_KEY=your-ghl-api-key
+GOHIGHLEVEL_LOCATION_ID=your-location-id
+
+# Airtable Database
+AIRTABLE_API_KEY=your-airtable-key
+AIRTABLE_BASE_ID=your-base-id
+
+# Optional
+NODE_ENV=production
+```
+
+### Vercel Environment Setup
+1. Navigate to Project → Settings → Environment Variables
+2. Add all variables for Production, Preview, and Development
+3. Redeploy after adding variables
+
+### API Key Rotation Required
+- ✅ OpenAI API key - rotate before handoff
+- ✅ GoHighLevel API key - rotate before handoff  
+- ✅ Airtable API key - rotate before handoff
+
+## 3. Airtable Configuration
+
+### Base Transfer
+- Transfer ownership to `ali@outdoorable.co`
+- Base Name: "Outdoorable Experts Database"
+- Base ID: [current-base-id]
+
+### Table Structure
+#### Experts Table
+- **Name** (Single line text)
+- **Email** (Email)
+- **Specialties** (Multiple select: Adventure, Cultural, Budget, Luxury, Family)
+- **Regions** (Multiple select: North America, Europe, Asia, etc.)
+- **Bio** (Long text)
+- **Contact_Info** (Long text)
+- **Active** (Checkbox)
+
+#### Automations
+- No current automations configured
+- Expert matching handled via API calls in application
+
+## 4. AI Logic & Prompts
+
+### System Prompts Location
+File: `src/lib/tripGuideGenerator.ts`
+
+#### Inspire Me Flow Prompt
+```typescript
+const inspirePrompt = `You are an expert travel advisor...`
+```
+
+#### I Know Where Flow Prompt  
+```typescript
+const planningPrompt = `Create a detailed trip guide for...`
+```
+
+### Prompt Updates
+1. Edit prompts in `src/lib/tripGuideGenerator.ts`
+2. Deploy changes via git push
+3. Test with `?TestMod=1` parameter
+
+### OpenAI Configuration
+- Model: `gpt-4-turbo-preview`
+- Max tokens: 2000
+- Temperature: 0.7
+- Located in: `src/lib/openai.ts`
+
+## 5. Operations Runbook
+
+### Deployment Process
+```bash
+# Staging (Preview)
+git push origin feature-branch  # Auto-deploys preview
+
+# Production
+git push origin main           # Auto-deploys to production
+```
+
+### Rollback Steps
+1. Go to Vercel Dashboard → Deployments
+2. Find last working deployment
+3. Click "Promote to Production"
+4. Or revert git commit: `git revert HEAD && git push`
+
+### Logs & Monitoring
+- **Vercel Logs**: Dashboard → Functions → View logs
+- **Client Logs**: Browser developer console
+- **API Errors**: Check Vercel function logs for 500 errors
+
+### Content Updates
+1. Update Airtable experts database directly
+2. Changes reflect immediately (no redeploy needed)
+3. Test expert matching with `?TestMod=1`
+
+## 6. Service Integrations & Accounts
+
+### Services Used
+- **GitHub**: Repository hosting
+- **Vercel**: App hosting and deployment
+- **OpenAI**: AI trip guide generation
+- **GoHighLevel**: CRM lead capture
+- **Airtable**: Expert database
+
+### Account Ownership Transfer
+All accounts should be transferred to `ali@outdoorable.co`:
+- ✅ GitHub repository access
+- ✅ Vercel project ownership  
+- ✅ Airtable base ownership
+- ✅ Domain management (if custom domain)
+
+### Billing Considerations
+- **Vercel**: Hobby plan sufficient for moderate traffic
+- **OpenAI**: Pay-per-use (~$0.01 per trip guide)
+- **Airtable**: Free plan supports 1,200 records
+- **GoHighLevel**: Existing client account
+
+## 7. Critical Files & Configuration
+
+### Must-Know Files
+1. **`next.config.js`** - Enables iframe embedding (CSP headers)
+2. **`src/app/page.tsx`** - Main application entry and user flow
+3. **`src/lib/tripGuideGenerator.ts`** - AI integration and prompts
+4. **`src/lib/gohighlevel.ts`** - CRM lead saving
+5. **`src/components/FlowSelector.tsx`** - User journey start
+
+### Iframe Embedding
 ```html
 <iframe 
-  src="https://your-domain.vercel.app/?embedded=true&theme=light" 
+  src="https://your-domain.vercel.app/?embedded=true" 
   width="100%" 
   height="600" 
   frameborder="0">
 </iframe>
 ```
 
-### Vercel Deployment
-1. Connected to GitHub repository
-2. Automatic deployments on `git push`
-3. Environment variables configured in Vercel dashboard
-4. Custom domain configured if needed
+### Test Mode Access
+- URL: `https://your-domain.vercel.app/?TestMod=1`
+- Provides testing interface for all flows
+- No API calls to external services in test mode
 
-## Key Files You Need to Know
+## 8. Known Limitations & Notes
 
-### Must Understand Files:
-1. **`next.config.js`** - Makes iframe embedding work (CSP headers)
-2. **`src/app/page.tsx`** - Main application logic and user flow
-3. **`src/lib/tripGuideGenerator.ts`** - AI trip guide creation
-4. **`src/lib/gohighlevel.ts`** - CRM integration
-5. **`src/components/Questionnaire/FlowSelector.tsx`** - User journey starts here
+### Current Limitations
+- Expert matching limited to Airtable record limits (1,200 free plan)
+- AI generation takes 15-30 seconds per request
+- Requires active internet connection for all features
 
-### Configuration Files:
-1. **`.env.local`** - API keys and secrets
-2. **`package.json`** - Dependencies and scripts  
-3. **`tsconfig.json`** - TypeScript settings
+### Performance Considerations
+- Widget loads in ~2-3 seconds on fast connections
+- Mobile responsive but optimized for desktop
+- OpenAI API calls are rate limited (handle gracefully)
 
-### Testing:
-1. **`src/test-mode/`** - Test interface (`?TestMod=1`)
-2. **`src/__tests__/`** - Automated tests
+### Cost Monitoring
+- **OpenAI**: ~$0.01 per trip guide generated
+- **Expected monthly cost**: $10-50 for moderate traffic
+- Monitor Vercel bandwidth usage
 
-## Common Issues & Solutions
+### Maintenance Best Practices
+1. Monitor OpenAI API costs monthly
+2. Update Airtable experts database regularly
+3. Test widget embedding after any code changes
+4. Keep dependencies updated quarterly
 
-### Embedding Problems
-- **Issue**: Widget not loading in iframe
-- **Solution**: Check `next.config.js` CSP headers, ensure `frame-ancestors *`
+### Future Improvements
+- Add analytics tracking
+- Implement caching for expert matching
+- Add more customizable prompts
+- Support multiple languages
 
-### API Failures  
-- **Issue**: OpenAI or GoHighLevel errors
-- **Solution**: Check API keys in `.env.local`, verify rate limits
+## 9. Support & Contact
 
-### Development Issues
-- **Issue**: Build failures
-- **Solution**: Run `npm install`, check Node.js version (16+)
+### Handoff Support
+- **Developer**: [developer-contact]
+- **Support Window**: 2 weeks post-handoff
+- **Response Time**: 24-48 hours for technical issues
 
-## Project Value
+### Emergency Contacts
+- **Critical Issues**: Vercel status page, OpenAI status
+- **Rollback Required**: Use Vercel dashboard or git revert
+- **API Failures**: Check service status pages first
 
-This project combines:
-- ✅ Interactive React frontend with multi-step flows
-- ✅ AI integration (OpenAI) for content generation  
-- ✅ CRM integration (GoHighLevel) for lead capture
-- ✅ Database integration (Airtable) for expert matching
-- ✅ Universal embedding capability (works anywhere)
-- ✅ Mobile responsive design
-- ✅ Test mode for easy QA
-- ✅ Production-ready deployment pipeline
+---
 
-**Technical complexity**: Handles cross-domain embedding, AI API integration, CRM automation, responsive design, error handling, and performance optimization - all in a single embeddable widget.
-
-**Business impact**: Converts website visitors into qualified leads through interactive experience, with automatic CRM integration and expert matching.
+**Project Status**: Production Ready ✅  
+**Last Updated**: [current-date]  
+**Next Review**: 3 months post-handoff
