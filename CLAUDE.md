@@ -85,12 +85,18 @@
 - Handle API errors gracefully with proper fallbacks
 
 ### Airtable MCP Integration
-- **Primary Method**: Use official MCP server via NPX (`npx -y airtable-mcp-server`)
-- **Installation**: Server is installed and ready - no local files needed
+- **Primary Method**: Use official MCP server via NPM (`npm install airtable-mcp-server`)
+- **Version**: v1.7.2+ (latest stable)
+- **Installation**: Installed as project dependency for better stability and version control
+- **Alternative**: NPX method available (`npx -y airtable-mcp-server`) but NPM preferred
 - **Security**: API keys stored in environment variables, never transmitted externally
 - **Architecture**: Local MCP server communicates directly with Airtable API
 - **Capabilities**: Full CRUD operations, schema inspection, search, and table management
+- **API Tokens**: Two verified working tokens available:
+  - `AIRTABLE_API_KEY` - Primary token (current)
+  - `AIRTABLE_MCP_TOKEN` - Backup MCP-specific token 
 - **Usage**: Configure in Claude Desktop/Cursor with AIRTABLE_API_KEY environment variable
+- **Local Access**: Run via `./node_modules/.bin/airtable-mcp-server` or `npx airtable-mcp-server`
 
 ## Widget-Specific Considerations
 
