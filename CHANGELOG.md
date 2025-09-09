@@ -1,5 +1,43 @@
 # Outdoorable TripGuide Widget - Changelog
 
+## [v1.7.0] - January 9, 2025 (Session 8 - Location Tags Expert Matching Task Planning)
+
+### 📋 Implementation Planning Complete
+- **PRD Analysis**: Comprehensive analysis of location tags expert matching requirements against existing codebase
+- **Task Breakdown**: Created 3-phase implementation plan following CLAUDE.md principles  
+- **Architecture Review**: Identified that 80% of required functionality already exists in expertMatcher.ts
+- **Conservative Approach**: Plan extends existing systems rather than creating duplicate infrastructure
+
+### 🎯 Task Structure Created
+- **Task 0001**: `enhance-location-tagging-system.md` - Extend existing expert matcher with hierarchical location scoring
+- **Task 0002**: `integrate-trip-guide-expert-matching.md` - Show expert cards under trip idea accordions  
+- **Task 0003**: `extend-test-mode-location-features.md` - Add location testing to Test Mode system
+- **Task Template**: Standardized task structure for future development phases
+
+### 🛠️ Technical Strategy
+- **Zero Duplication**: Extends existing `src/lib/expertMatcher.ts` instead of creating new systems
+- **Hierarchical Scoring**: 30-point weighted system (specific-area → city → region → country)
+- **Backward Compatibility**: All existing expert matching continues to work unchanged  
+- **MCP Integration**: Uses established Airtable integration patterns from `src/lib/airtable.ts`
+
+### 📊 Existing System Analysis
+- **Expert Matching**: ✅ Complete AI-powered system with 43+ real experts
+- **Trip Guide Generation**: ✅ Advanced implementation with dual flow support
+- **Test Mode Framework**: ✅ Sophisticated testing infrastructure ready for extension
+- **Component Architecture**: ✅ Well-structured ExpertCard and TripGuide components
+
+### 🎨 Implementation Approach
+- **Modify Not Create**: Enhance existing files rather than building from scratch
+- **Consistent Patterns**: Follow established OpenAI and Airtable integration styles
+- **Real Data Focus**: No mock data - work with live expert database from day one
+- **Test-Driven**: Every enhancement includes Test Mode integration
+
+### ✅ Ready for Development
+- **Branch Created**: `expert-matching` branch with all task files
+- **Documentation Complete**: PRD, tasks, and template all committed
+- **Architecture Validated**: Technical approach confirmed against existing codebase
+- **Next Phase**: Ready to implement Task 0001 location hierarchy enhancement
+
 ## [v1.6.1] - September 9, 2025 (Session 7 - Airtable MCP Server Integration)
 
 ### 🔌 Airtable MCP Integration Implementation
