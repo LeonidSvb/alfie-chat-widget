@@ -1,11 +1,15 @@
 import Airtable from 'airtable';
 
-// Простая функция для получения экспертов из Airtable
-// Возвращает только ID, profession и one line bio
+// Полная функция для получения экспертов из Airtable
+// Возвращает все необходимые поля для отображения
 export interface SimpleExpert {
   id: string;
+  name: string;
   profession: string;
   oneline_bio: string;
+  avatar?: string;
+  link?: string;
+  bio?: string;
 }
 
 // Кэшированные данные экспертов
@@ -27,14 +31,24 @@ export async function fetchAllExperts(): Promise<SimpleExpert[]> {
 
     const records = await airtable(EXPERTS_TABLE).select({
       maxRecords: 100,
-      fields: ['Profession(s)', 'One line bio'] // Только нужные поля
+      fields: ['Author Name', 'Profession(s)', 'One line bio', 'Profile Picture 600 x 600', 'Profile Link']
     }).all();
 
-    const experts: SimpleExpert[] = records.map(record => ({
-      id: record.id,
-      profession: (record.get('Profession(s)') as string) || '',
-      oneline_bio: (record.get('One line bio') as string) || ''
-    }));
+    const experts: SimpleExpert[] = records.map(record => {
+      // Получаем URL фото из массива объектов Airtable
+      const photoArray = record.get('Profile Picture 600 x 600') as any[];
+      const avatarUrl = photoArray && photoArray.length > 0 ? photoArray[0].url : undefined;
+      
+      return {
+        id: record.id,
+        name: (record.get('Author Name') as string) || 'Expert',
+        profession: (record.get('Profession(s)') as string) || 'Professional Guide',
+        oneline_bio: (record.get('One line bio') as string) || '',
+        avatar: avatarUrl,
+        link: (record.get('Profile Link') as string) || undefined,
+        bio: (record.get('One line bio') as string) || '' // используем oneline_bio как bio
+      };
+    });
 
     // Кэшируем результат
     cachedExperts = experts;
