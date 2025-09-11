@@ -7,6 +7,7 @@ export interface TripGuide {
   questionnaireSummary: Record<string, any>;
   tags: string[];
   estimatedReadTime?: number;
+  bypassEmail?: boolean; // For test mode - skip email collection
 }
 
 export interface TripGuideSection {

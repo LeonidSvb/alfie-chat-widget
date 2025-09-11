@@ -111,9 +111,34 @@ export default function HomePage({
       }
     };
 
+    // Expert test mode - display pre-generated trip guide with experts
+    const handleTestExpertDisplay = async (event: CustomEvent) => {
+      const { tripGuide, expertIds, bypassEmail } = event.detail;
+      debugLog('Expert test mode - displaying pre-generated trip guide', { 
+        guideId: tripGuide.id,
+        flowType: tripGuide.flowType,
+        expertCount: expertIds.length,
+        bypassEmail: bypassEmail || false
+      });
+
+      // Set state directly without generation
+      setSelectedFlow(tripGuide.flowType);
+      setQuestionnaireData(null); // No questionnaire data needed
+      setTripGuide({
+        ...tripGuide,
+        expertIds: expertIds,
+        bypassEmail: bypassEmail || false // Add bypass flag to trip guide
+      });
+      setAppState('results');
+      setGenerationError(null);
+    };
+
     window.addEventListener('testModeGenerate', handleTestGenerate as unknown as EventListener);
+    window.addEventListener('testModeExpertDisplay', handleTestExpertDisplay as unknown as EventListener);
+    
     return () => {
       window.removeEventListener('testModeGenerate', handleTestGenerate as unknown as EventListener);
+      window.removeEventListener('testModeExpertDisplay', handleTestExpertDisplay as unknown as EventListener);
     };
   }, []);
 

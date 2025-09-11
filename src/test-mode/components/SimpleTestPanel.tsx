@@ -189,37 +189,61 @@ export default function SimpleTestPanel() {
     }
   };
 
-  const handleTestExperts = async () => {
+  const handleTestExperts = async (flowType?: 'inspire-me' | 'i-know-where') => {
     setState(prev => ({ ...prev, isRunning: true, logs: [] }));
     
     const logger = testRegistry.getLogger();
-    logger.info('expert-test', 'started', { timestamp: new Date().toISOString() });
+    logger.info('expert-test', 'started', { 
+      timestamp: new Date().toISOString(),
+      flowType: flowType || 'random'
+    });
 
     try {
-      // Выбираем случайный сценарий
-      const randomScenario = allExpertTestScenarios[Math.floor(Math.random() * allExpertTestScenarios.length)];
+      // Импортируем готовые trip guides
+      const { inspireMeTestGuides, iKnowWhereTestGuides } = await import('@/data/preGeneratedTripGuides');
       
-      logger.info('expert-test', 'scenario_selected', {
-        scenarioId: randomScenario.id,
-        scenarioName: randomScenario.name,
-        flowType: randomScenario.data.flowType
+      let availableGuides;
+      if (flowType === 'inspire-me') {
+        availableGuides = inspireMeTestGuides;
+      } else if (flowType === 'i-know-where') {
+        availableGuides = iKnowWhereTestGuides;
+      } else {
+        // Случайный выбор из всех
+        const { allTestTripGuides } = await import('@/data/preGeneratedTripGuides');
+        availableGuides = allTestTripGuides;
+      }
+      
+      // Выбираем случайный готовый trip guide из фильтрованного списка
+      const randomTripGuide = availableGuides[Math.floor(Math.random() * availableGuides.length)];
+      
+      logger.info('expert-test', 'trip_guide_selected', {
+        guideId: randomTripGuide.id,
+        guideName: randomTripGuide.title,
+        flowType: randomTripGuide.flowType,
+        expertCount: randomTripGuide.expertIds.length,
+        requestedFlowType: flowType || 'random'
       });
 
       setState(prev => ({
         ...prev,
-        generatedAnswers: randomScenario.data,
+        generatedAnswers: null, // Не нужны questionnaire данные
         logs: logger.getLogs()
       }));
 
-      // Автоматически запускаем тестирование как в handleTestFlow
-      const event = new CustomEvent('testModeGenerate', {
-        detail: randomScenario.data
+      // Отправляем готовый trip guide с экспертами напрямую с bypass flag
+      const event = new CustomEvent('testModeExpertDisplay', {
+        detail: {
+          tripGuide: randomTripGuide,
+          expertIds: randomTripGuide.expertIds,
+          bypassEmail: true // Новый флаг для обхода email gate
+        }
       });
       window.dispatchEvent(event);
 
-      logger.info('expert-test', 'expert_test_triggered', {
-        scenarioId: randomScenario.id,
-        description: randomScenario.description
+      logger.info('expert-test', 'expert_display_triggered', {
+        guideId: randomTripGuide.id,
+        expertIds: randomTripGuide.expertIds,
+        bypassEmail: true
       });
 
       setState(prev => ({ 
@@ -373,24 +397,65 @@ export default function SimpleTestPanel() {
           📧 Test Email Submission
         </button>
 
-        <button
-          onClick={handleTestExperts}
-          disabled={state.isRunning}
-          style={{
-            width: '100%',
-            padding: '12px',
-            marginTop: '12px',
-            borderRadius: '6px',
-            border: '1px solid #4A8B5C',
-            background: state.isRunning ? '#9ca3af' : '#4A8B5C',
-            color: 'white',
-            fontWeight: '500',
-            cursor: state.isRunning ? 'not-allowed' : 'pointer',
-            fontSize: '14px'
-          }}
-        >
-          👨‍🎓 Test Expert Matching
-        </button>
+        <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #e9ecef' }}>
+          <h4 style={{ margin: '0 0 12px 0', color: '#495057', fontSize: '13px' }}>Expert Testing (Bypass Email):</h4>
+          
+          <button
+            onClick={() => handleTestExperts('inspire-me')}
+            disabled={state.isRunning}
+            style={{
+              width: '100%',
+              padding: '10px',
+              marginBottom: '8px',
+              borderRadius: '6px',
+              border: '1px solid #4A8B5C',
+              background: state.isRunning ? '#9ca3af' : '#4A8B5C',
+              color: 'white',
+              fontWeight: '500',
+              cursor: state.isRunning ? 'not-allowed' : 'pointer',
+              fontSize: '13px'
+            }}
+          >
+            🌟 Test Inspire Me Experts
+          </button>
+
+          <button
+            onClick={() => handleTestExperts('i-know-where')}
+            disabled={state.isRunning}
+            style={{
+              width: '100%',
+              padding: '10px',
+              marginBottom: '8px',
+              borderRadius: '6px',
+              border: '1px solid #2D5AA0',
+              background: state.isRunning ? '#9ca3af' : '#2D5AA0',
+              color: 'white',
+              fontWeight: '500',
+              cursor: state.isRunning ? 'not-allowed' : 'pointer',
+              fontSize: '13px'
+            }}
+          >
+            🗺️ Test I Know Where Experts
+          </button>
+
+          <button
+            onClick={() => handleTestExperts()}
+            disabled={state.isRunning}
+            style={{
+              width: '100%',
+              padding: '10px',
+              borderRadius: '6px',
+              border: '1px solid #6f42c1',
+              background: state.isRunning ? '#9ca3af' : '#6f42c1',
+              color: 'white',
+              fontWeight: '500',
+              cursor: state.isRunning ? 'not-allowed' : 'pointer',
+              fontSize: '13px'
+            }}
+          >
+            🎲 Test Random Expert Flow
+          </button>
+        </div>
       </div>
 
       {/* Generated Answers Display */}

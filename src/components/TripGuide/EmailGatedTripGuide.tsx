@@ -34,14 +34,14 @@ export default function EmailGatedTripGuide({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | undefined>();
 
-  // Check if email was already submitted for this guide
+  // Check if email was already submitted for this guide or if bypass is enabled
   useEffect(() => {
     const storageKey = `tripguide-email-submitted-${tripGuide.id}`;
     const hasSubmitted = sessionStorage.getItem(storageKey) === 'true';
-    if (hasSubmitted) {
+    if (hasSubmitted || tripGuide.bypassEmail) {
       setEmailSubmitted(true);
     }
-  }, [tripGuide.id]);
+  }, [tripGuide.id, tripGuide.bypassEmail]);
 
   const handleEmailSubmit = async (data: EmailSubmissionData) => {
     setIsSubmitting(true);

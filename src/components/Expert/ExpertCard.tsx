@@ -25,7 +25,31 @@ export default function ExpertCard({
     }
   };
 
-  const firstName = expert.name.split(' ')[0];
+  // Защита от undefined имени
+  const firstName = expert.name ? expert.name.split(' ')[0] : 'Expert';
+
+  // Если нет основных данных, показываем placeholder
+  if (!expert.name) {
+    return (
+      <div className={`alfie-simple-expert-card ${className}`}>
+        <div className="alfie-expert-header">
+          <div className="alfie-expert-info">
+            <h3 className="alfie-expert-name">Loading expert...</h3>
+            <p className="alfie-expert-profession">(Professional Guide)</p>
+          </div>
+        </div>
+        <div className="alfie-expert-actions">
+          <button 
+            className="alfie-talk-to-expert-btn"
+            disabled
+            type="button"
+          >
+            Loading...
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`alfie-simple-expert-card ${className}`}>

@@ -43,7 +43,24 @@ export default function ExpertSection({ expertIds, flowType, className = '' }: E
         });
 
         const expertsData = await Promise.all(expertPromises);
-        setExperts(expertsData.filter(Boolean)); // Фильтруем null/undefined
+        
+        // Фильтруем и создаем fallback данные для поврежденных экспертов
+        const validExperts = expertsData.map((expert, index) => {
+          if (!expert || !expert.name) {
+            // Создаем fallback эксперта
+            return {
+              id: ids[index] || `fallback-${index}`,
+              name: `Expert ${index + 1}`,
+              profession: 'Professional Guide',
+              avatar: undefined,
+              link: undefined,
+              bio: 'Expert information is being loaded...'
+            };
+          }
+          return expert;
+        });
+        
+        setExperts(validExperts);
       } catch (err) {
         console.error('Failed to fetch expert details:', err);
         setError('Failed to load expert information');
