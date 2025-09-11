@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { testRegistry } from '../registry.js';
 import randomAnswersData from '../data/randomAnswers.json';
+import { allExpertTestScenarios } from '@/data/expertTestScenarios';
 
 interface SimpleTestPanelState {
   isRunning: boolean;
@@ -188,6 +189,58 @@ export default function SimpleTestPanel() {
     }
   };
 
+  const handleTestExperts = async () => {
+    setState(prev => ({ ...prev, isRunning: true, logs: [] }));
+    
+    const logger = testRegistry.getLogger();
+    logger.info('expert-test', 'started', { timestamp: new Date().toISOString() });
+
+    try {
+      // Выбираем случайный сценарий
+      const randomScenario = allExpertTestScenarios[Math.floor(Math.random() * allExpertTestScenarios.length)];
+      
+      logger.info('expert-test', 'scenario_selected', {
+        scenarioId: randomScenario.id,
+        scenarioName: randomScenario.name,
+        flowType: randomScenario.data.flowType
+      });
+
+      setState(prev => ({
+        ...prev,
+        generatedAnswers: randomScenario.data,
+        logs: logger.getLogs()
+      }));
+
+      // Автоматически запускаем тестирование как в handleTestFlow
+      const event = new CustomEvent('testModeGenerate', {
+        detail: randomScenario.data
+      });
+      window.dispatchEvent(event);
+
+      logger.info('expert-test', 'expert_test_triggered', {
+        scenarioId: randomScenario.id,
+        description: randomScenario.description
+      });
+
+      setState(prev => ({ 
+        ...prev, 
+        isRunning: false,
+        logs: logger.getLogs()
+      }));
+
+    } catch (error) {
+      logger.error('expert-test', 'expert_test_error', {
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      
+      setState(prev => ({ 
+        ...prev, 
+        isRunning: false,
+        logs: logger.getLogs()
+      }));
+    }
+  };
+
   return (
     <div style={{ 
       width: '400px',
@@ -318,6 +371,25 @@ export default function SimpleTestPanel() {
           }}
         >
           📧 Test Email Submission
+        </button>
+
+        <button
+          onClick={handleTestExperts}
+          disabled={state.isRunning}
+          style={{
+            width: '100%',
+            padding: '12px',
+            marginTop: '12px',
+            borderRadius: '6px',
+            border: '1px solid #4A8B5C',
+            background: state.isRunning ? '#9ca3af' : '#4A8B5C',
+            color: 'white',
+            fontWeight: '500',
+            cursor: state.isRunning ? 'not-allowed' : 'pointer',
+            fontSize: '14px'
+          }}
+        >
+          👨‍🎓 Test Expert Matching
         </button>
       </div>
 

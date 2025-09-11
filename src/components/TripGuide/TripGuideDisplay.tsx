@@ -12,6 +12,7 @@ export default function TripGuideDisplay({
   return (
     <EmailGatedTripGuide
       tripGuide={tripGuide}
+      expertIds={(tripGuide as any).expertIds}
       onEmailSubmit={onEmailSubmit}
       className={className}
     />

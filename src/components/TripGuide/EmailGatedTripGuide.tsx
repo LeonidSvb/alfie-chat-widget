@@ -6,9 +6,11 @@ import { EmailSubmissionData, CRMSubmissionResponse } from '@/types/crm';
 import InlineEmailGate from '@/components/EmailCollection/InlineEmailGate';
 import AIContentRenderer from './AIContentRenderer';
 import TripGuideChips from './TripGuideChips';
+import ExpertSection from '@/components/Expert/ExpertSection';
 
 interface EmailGatedTripGuideProps {
   tripGuide: TripGuide;
+  expertIds?: string | string[];
   onEmailSubmit?: (email: string, firstName?: string, lastName?: string) => void;
   className?: string;
 }
@@ -24,6 +26,7 @@ type ParsedFacts = {
 
 export default function EmailGatedTripGuide({
   tripGuide,
+  expertIds,
   onEmailSubmit,
   className = ''
 }: EmailGatedTripGuideProps): JSX.Element {
@@ -227,14 +230,33 @@ export default function EmailGatedTripGuide({
                 ))}
 
                 {/* Interactive accordions for other sections */}
-                {sections.filter(s => !s.title.startsWith('🌄')).map(s => (
-                  <AccordionSection key={s.key} section={s} />
+                {sections.filter(s => !s.title.startsWith('🌄')).map((s, index) => (
+                  <div key={s.key}>
+                    <AccordionSection section={s} />
+                    {/* For inspire-me flow: show experts after each accordion */}
+                    {tripGuide.flowType === 'inspire-me' && expertIds && Array.isArray(expertIds) && expertIds[index] && (
+                      <ExpertSection 
+                        expertIds={[expertIds[index]]} 
+                        flowType="inspire-me"
+                        className="alfie-expert-under-accordion"
+                      />
+                    )}
+                  </div>
                 ))}
               </div>
             ) : (
               <AIContentRenderer content={tripGuide.content} />
             )}
           </div>
+
+          {/* For i-know-where flow: show experts at the end */}
+          {tripGuide.flowType === 'i-know-where' && expertIds && (
+            <ExpertSection 
+              expertIds={expertIds} 
+              flowType="i-know-where"
+              className="alfie-expert-at-end"
+            />
+          )}
         </article>
       </div>
     </div>

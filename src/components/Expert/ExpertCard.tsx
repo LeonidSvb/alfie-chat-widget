@@ -1,13 +1,22 @@
 import React from 'react';
-import { Expert, ExpertCardProps } from '@/types/expert';
+
+interface SimpleExpertCardProps {
+  expert: {
+    id: string;
+    name: string;
+    profession?: string;
+    avatar?: string;
+    link?: string;
+  };
+  className?: string;
+  onContactClick?: (expert: any) => void;
+}
 
 export default function ExpertCard({
   expert,
-  matchScore,
-  onContactClick,
   className = '',
-  showMatchScore = false
-}: ExpertCardProps) {
+  onContactClick
+}: SimpleExpertCardProps) {
   const handleContactClick = () => {
     if (onContactClick) {
       onContactClick(expert);
@@ -16,12 +25,10 @@ export default function ExpertCard({
     }
   };
 
-  const formatMatchScore = (score: number) => {
-    return Math.round(score * 100);
-  };
+  const firstName = expert.name.split(' ')[0];
 
   return (
-    <div className={`alfie-expert-card ${className}`}>
+    <div className={`alfie-simple-expert-card ${className}`}>
       <div className="alfie-expert-header">
         {expert.avatar && (
           <div className="alfie-expert-avatar">
@@ -36,69 +43,38 @@ export default function ExpertCard({
         )}
         <div className="alfie-expert-info">
           <h3 className="alfie-expert-name">{expert.name}</h3>
-          {expert.location && (
-            <p className="alfie-expert-location">📍 {expert.location}</p>
-          )}
-          {expert.rating && expert.reviewCount && (
-            <div className="alfie-expert-rating">
-              ⭐ {expert.rating} ({expert.reviewCount} reviews)
-            </div>
-          )}
-          {showMatchScore && matchScore && (
-            <div className="alfie-match-score">
-              🎯 {formatMatchScore(matchScore)}% match
-            </div>
+          {expert.profession && (
+            <p className="alfie-expert-profession">({expert.profession})</p>
           )}
         </div>
       </div>
 
-      <div className="alfie-expert-content">
-        <p className="alfie-expert-description">{expert.description}</p>
-        
-        {expert.specialties.length > 0 && (
-          <div className="alfie-expert-specialties">
-            <span className="alfie-label">Specialties:</span>
-            <div className="alfie-tags">
-              {expert.specialties.map((specialty, index) => (
-                <span key={index} className="alfie-tag">{specialty}</span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {expert.languages && expert.languages.length > 0 && (
-          <div className="alfie-expert-languages">
-            <span className="alfie-label">Languages:</span>
-            <span>{expert.languages.join(', ')}</span>
-          </div>
-        )}
-      </div>
-
       <div className="alfie-expert-actions">
         <button 
-          className="alfie-contact-expert-btn"
+          className="alfie-talk-to-expert-btn"
           onClick={handleContactClick}
           type="button"
         >
-          Get in Touch
+          Talk to {firstName}
         </button>
       </div>
 
       <style jsx>{`
-        .alfie-expert-card {
+        .alfie-simple-expert-card {
           background: white;
-          border-radius: 16px;
-          padding: 24px;
-          margin: 20px 0;
-          border: 2px solid var(--alfie-dark-green, #D4EDD4);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          border-radius: 12px;
+          padding: 16px;
+          margin: 16px 0;
+          border: 1px solid #e5e7eb;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+          max-width: 280px;
         }
 
         .alfie-expert-header {
           display: flex;
-          align-items: flex-start;
-          margin-bottom: 16px;
-          gap: 16px;
+          align-items: center;
+          margin-bottom: 12px;
+          gap: 12px;
         }
 
         .alfie-expert-avatar {
@@ -106,137 +82,80 @@ export default function ExpertCard({
         }
 
         .alfie-expert-avatar img {
-          width: 64px;
-          height: 64px;
+          width: 48px;
+          height: 48px;
           border-radius: 50%;
           object-fit: cover;
-          border: 3px solid var(--alfie-green, #4A8B5C);
+          border: none;
         }
 
         .alfie-expert-info {
           flex: 1;
+          min-width: 0;
         }
 
         .alfie-expert-name {
-          font-size: 20px;
-          font-weight: 700;
-          color: var(--alfie-text, #2E4B3E);
-          margin: 0 0 4px 0;
-        }
-
-        .alfie-expert-location {
-          font-size: 14px;
-          color: var(--alfie-text-light, #4A6741);
-          margin: 0 0 4px 0;
-        }
-
-        .alfie-expert-rating {
-          font-size: 14px;
-          color: var(--alfie-text-light, #4A6741);
-          margin: 0 0 4px 0;
-        }
-
-        .alfie-match-score {
-          font-size: 14px;
+          font-size: 16px;
           font-weight: 600;
-          color: var(--alfie-green, #4A8B5C);
-          margin: 4px 0;
+          color: #1f2937;
+          margin: 0 0 2px 0;
+          line-height: 1.2;
         }
 
-        .alfie-expert-content {
-          margin-bottom: 20px;
-        }
-
-        .alfie-expert-description {
-          font-size: 15px;
-          line-height: 1.5;
-          color: var(--alfie-text, #2E4B3E);
-          margin: 0 0 16px 0;
-        }
-
-        .alfie-expert-specialties,
-        .alfie-expert-languages {
-          margin-bottom: 12px;
-        }
-
-        .alfie-label {
-          font-size: 14px;
-          font-weight: 600;
-          color: var(--alfie-text, #2E4B3E);
-          display: block;
-          margin-bottom: 6px;
-        }
-
-        .alfie-tags {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 6px;
-        }
-
-        .alfie-tag {
-          background: var(--alfie-dark-green, #D4EDD4);
-          color: var(--alfie-text, #2E4B3E);
-          padding: 4px 12px;
-          border-radius: 16px;
+        .alfie-expert-profession {
           font-size: 13px;
-          font-weight: 500;
-        }
-
-        .alfie-expert-languages span:last-child {
-          font-size: 14px;
-          color: var(--alfie-text-light, #4A6741);
+          color: #6b7280;
+          margin: 0;
+          line-height: 1.2;
         }
 
         .alfie-expert-actions {
-          text-align: center;
+          text-align: left;
         }
 
-        .alfie-contact-expert-btn {
-          background: var(--alfie-green, #4A8B5C);
-          color: white;
+        .alfie-talk-to-expert-btn {
+          background: none;
+          color: #1f2937;
           border: none;
-          padding: 14px 32px;
-          font-size: 16px;
-          font-weight: 600;
-          border-radius: 25px;
+          padding: 0;
+          font-size: 14px;
+          font-weight: 500;
           cursor: pointer;
-          transition: all 0.2s ease;
-          text-decoration: none;
-          display: inline-block;
+          text-decoration: underline;
           font-family: inherit;
+          text-align: left;
         }
 
-        .alfie-contact-expert-btn:hover {
-          background: var(--alfie-text, #2E4B3E);
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(74, 139, 92, 0.3);
-        }
-
-        .alfie-contact-expert-btn:active {
-          transform: translateY(0);
+        .alfie-talk-to-expert-btn:hover {
+          color: var(--alfie-green, #4A8B5C);
         }
 
         @media (max-width: 480px) {
-          .alfie-expert-card {
-            padding: 20px;
+          .alfie-simple-expert-card {
+            padding: 12px;
+            margin: 12px 0;
+            max-width: 100%;
           }
 
           .alfie-expert-header {
-            gap: 12px;
+            gap: 10px;
           }
 
           .alfie-expert-avatar img {
-            width: 56px;
-            height: 56px;
+            width: 40px;
+            height: 40px;
           }
 
           .alfie-expert-name {
-            font-size: 18px;
+            font-size: 15px;
           }
 
-          .alfie-contact-expert-btn {
-            padding: 12px 24px;
-            font-size: 15px;
+          .alfie-expert-profession {
+            font-size: 12px;
+          }
+
+          .alfie-talk-to-expert-btn {
+            font-size: 13px;
           }
         }
       `}</style>

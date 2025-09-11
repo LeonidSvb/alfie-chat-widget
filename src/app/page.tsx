@@ -68,9 +68,9 @@ export default function HomePage({
       setAppState('generating');
       setGenerationError(null);
       
-      // Generate trip guide automatically - same logic as handleQuestionnaireComplete
+      // Generate trip guide with experts automatically - same logic as handleQuestionnaireComplete
       try {
-        const response = await fetch('/api/generate-trip-guide', {
+        const response = await fetch('/api/generate-trip-with-experts', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -86,12 +86,21 @@ export default function HomePage({
 
         const result = await response.json();
         if (!result.success) {
-          throw new Error(result.error || 'Failed to generate trip guide');
+          throw new Error(result.error || 'Failed to generate trip guide with experts');
         }
 
-        setTripGuide(result.guide);
+        // Add expert IDs to the trip guide object
+        const guideWithExperts = {
+          ...result.tripGuide,
+          expertIds: result.selectedExpertIds
+        };
+
+        setTripGuide(guideWithExperts);
         setAppState('results');
-        debugLog('Test mode trip guide generated successfully', { guideId: result.guide.id });
+        debugLog('Test mode trip guide with experts generated successfully', { 
+          guideId: result.tripGuide.id,
+          expertIds: result.selectedExpertIds
+        });
       } catch (error) {
         console.error('Test mode trip guide generation failed:', error);
         setGenerationError(error instanceof Error ? error.message : 'Unknown error occurred');
@@ -124,8 +133,8 @@ export default function HomePage({
     });
 
     try {
-      // Call OpenAI API to generate trip guide
-      const response = await fetch('/api/generate-trip-guide', {
+      // Call integrated API to generate trip guide with experts
+      const response = await fetch('/api/generate-trip-with-experts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -142,12 +151,22 @@ export default function HomePage({
       const result = await response.json();
 
       if (!result.success) {
-        throw new Error(result.error || 'Failed to generate trip guide');
+        throw new Error(result.error || 'Failed to generate trip guide with experts');
       }
 
-      setTripGuide(result.guide);
+      // Add expert IDs to the trip guide object for frontend use
+      const guideWithExperts = {
+        ...result.tripGuide,
+        expertIds: result.selectedExpertIds
+      };
+
+      setTripGuide(guideWithExperts);
       setAppState('results');
-      debugLog('Trip guide generated successfully', { guideId: result.guide.id });
+      debugLog('Trip guide with experts generated successfully', { 
+        guideId: result.tripGuide.id,
+        expertIds: result.selectedExpertIds,
+        timing: result.timing
+      });
 
     } catch (error) {
       console.error('Trip guide generation failed:', error);
