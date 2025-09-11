@@ -15,7 +15,7 @@
 
 import { openai } from './openai';
 import { expertSelectionPrompt } from '../../back/prompts/expert-selection-prompt';
-import { SimpleExpert } from './simpleExpertFetcher';
+import { SimpleExpert, fetchAllExperts } from './simpleExpertFetcher';
 import { TripGuide } from '../types/tripGuide';
 
 export interface ExpertSelectionRequest {
@@ -30,15 +30,13 @@ export interface ExpertSelectionResult {
 }
 
 /**
- * Основная функция выбора экспертов
+ * Основная функция выбора экспертов с автоматическим получением данных
  * 
  * @param tripGuide - Сгенерированный путеводитель (содержит flowType и content)
- * @param experts - Список доступных экспертов с их данными
  * @returns Результат с ID выбранного эксперта или массивом ID экспертов
  */
 export async function selectBestExpert(
-  tripGuide: TripGuide, 
-  experts: SimpleExpert[]
+  tripGuide: TripGuide
 ): Promise<ExpertSelectionResult> {
   try {
     // Валидация входных данных
@@ -46,8 +44,11 @@ export async function selectBestExpert(
       throw new Error('Trip guide content is required');
     }
 
+    // Получаем реальных экспертов из Airtable
+    const experts = await fetchAllExperts();
+    
     if (!experts || experts.length === 0) {
-      throw new Error('Experts list cannot be empty');
+      throw new Error('No experts available in database');
     }
 
     // Подготовка данных для AI

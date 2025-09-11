@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { selectBestExpert } from '@/lib/expertSelector';
-import { fetchAllExperts } from '@/lib/simpleExpertFetcher';
 import { TripGuide } from '@/types/tripGuide';
 
 export interface SelectExpertRequest {
@@ -63,22 +62,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<SelectExp
       );
     }
 
-    // Получаем список всех экспертов
-    const experts = await fetchAllExperts();
-
-    if (experts.length === 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'No experts available for selection',
-          errorType: 'no_experts'
-        },
-        { status: 404 }
-      );
-    }
-
-    // Выбираем наиболее подходящих экспертов
-    const selectionResult = await selectBestExpert(body.tripGuide, experts);
+    // Выбираем наиболее подходящих экспертов (функция сама получит данные из Airtable)
+    const selectionResult = await selectBestExpert(body.tripGuide);
 
     if (!selectionResult.success) {
       return NextResponse.json(
