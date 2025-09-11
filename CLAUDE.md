@@ -140,3 +140,4 @@ Where it is possible to make massive batches First, see what needs to be changed
 
 
 When you test, run localhost randomly from 3000 to 6000. Maximum randomly. And when you finish testing, close unused ports so that they don't accumulate. 
+- Never commit yourself on GitHub if I don't tell you directly about it.
