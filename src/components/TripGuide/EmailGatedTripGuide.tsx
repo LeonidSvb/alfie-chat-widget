@@ -7,6 +7,7 @@ import InlineEmailGate from '@/components/EmailCollection/InlineEmailGate';
 import AIContentRenderer from './AIContentRenderer';
 import TripGuideChips from './TripGuideChips';
 import ExpertSection from '@/components/Expert/ExpertSection';
+import ExpertSummaryBlock from '@/components/Expert/ExpertSummaryBlock';
 
 interface EmailGatedTripGuideProps {
   tripGuide: TripGuide;
@@ -213,6 +214,19 @@ export default function EmailGatedTripGuide({
           {/* Teaser facts (chips) */}
           <TripGuideChips facts={facts} />
 
+          {/* For i-know-where flow: show summary block and expert at the top */}
+          {tripGuide.flowType === 'i-know-where' && expertIds && (
+            <>
+              <ExpertSummaryBlock />
+              <ExpertSection 
+                expertIds={expertIds} 
+                flowType="i-know-where"
+                className="alfie-expert-at-top"
+                badgeText="Meet your expert:"
+              />
+            </>
+          )}
+
           {/* Trip Guide Content */}
           <div>
             {sections.length > 0 ? (
@@ -233,6 +247,12 @@ export default function EmailGatedTripGuide({
                 {sections.filter(s => !s.title.startsWith('🌄')).map((s, index) => (
                   <div key={s.key}>
                     <AccordionSection section={s} />
+                    
+                    {/* For inspire-me flow: show summary block after FIRST accordion, then experts */}
+                    {tripGuide.flowType === 'inspire-me' && index === 0 && expertIds && (
+                      <ExpertSummaryBlock />
+                    )}
+                    
                     {/* For inspire-me flow: show experts after each accordion */}
                     {tripGuide.flowType === 'inspire-me' && expertIds && Array.isArray(expertIds) && expertIds[index] && (
                       <ExpertSection 
@@ -255,6 +275,7 @@ export default function EmailGatedTripGuide({
               expertIds={expertIds} 
               flowType="i-know-where"
               className="alfie-expert-at-end"
+              badgeText="Ready to refine your plan?"
             />
           )}
         </article>

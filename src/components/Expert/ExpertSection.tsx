@@ -7,6 +7,7 @@ interface ExpertSectionProps {
   expertIds: string | string[];
   flowType: 'inspire-me' | 'i-know-where';
   className?: string;
+  badgeText?: string;
 }
 
 interface ExpertData {
@@ -18,7 +19,7 @@ interface ExpertData {
   bio?: string;
 }
 
-export default function ExpertSection({ expertIds, flowType, className = '' }: ExpertSectionProps) {
+export default function ExpertSection({ expertIds, flowType, className = '', badgeText }: ExpertSectionProps) {
   const [experts, setExperts] = useState<ExpertData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -78,7 +79,7 @@ export default function ExpertSection({ expertIds, flowType, className = '' }: E
     return (
       <div className={`alfie-expert-section loading ${className}`}>
         <div className="alfie-expert-header">
-          <div className="alfie-expert-badge">Your expert picks:</div>
+          <div className="alfie-expert-badge">{badgeText || 'Your expert picks:'}</div>
         </div>
         <div className="alfie-loading-placeholder">
           <div className="alfie-loading-spinner"></div>
@@ -139,7 +140,7 @@ export default function ExpertSection({ expertIds, flowType, className = '' }: E
   return (
     <div className={`alfie-expert-section ${className}`}>
       <div className="alfie-expert-header">
-        <div className="alfie-expert-badge">Your expert picks:</div>
+        <div className="alfie-expert-badge">{badgeText || 'Your expert picks:'}</div>
       </div>
       
       <div className={`alfie-experts-grid ${experts.length === 1 ? 'single' : 'multiple'}`}>
