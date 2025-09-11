@@ -51,4 +51,7 @@ coverage/
 
 # Runtime
 *.tgz
-*.tar.gzalfie-original/
+*.tar.gz
+
+# Backup folders
+alfie-original/

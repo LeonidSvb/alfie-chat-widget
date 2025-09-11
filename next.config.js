@@ -29,6 +29,15 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+
+  // Exclude backup folders from build
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@/lib/airtable': false, // Prevent importing deleted airtable lib
+    };
+    return config;
+  },
 };
 
 module.exports = nextConfig;

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { testRegistry } from '../registry.js';
 import randomAnswersData from '../data/randomAnswers.json';
-import { allExpertTestScenarios } from '@/data/expertTestScenarios';
+// import { allExpertTestScenarios } from '@/data/expertTestScenarios'; // Removed - using inline data
 
 interface SimpleTestPanelState {
   isRunning: boolean;
@@ -200,7 +200,9 @@ export default function SimpleTestPanel() {
 
     try {
       // Импортируем готовые trip guides
-      const { inspireMeTestGuides, iKnowWhereTestGuides } = await import('@/data/preGeneratedTripGuides');
+      // const { inspireMeTestGuides, iKnowWhereTestGuides } = await import('@/data/preGeneratedTripGuides');
+      const inspireMeTestGuides = [];
+      const iKnowWhereTestGuides = [];
       
       let availableGuides;
       if (flowType === 'inspire-me') {
@@ -209,8 +211,9 @@ export default function SimpleTestPanel() {
         availableGuides = iKnowWhereTestGuides;
       } else {
         // Случайный выбор из всех
-        const { allTestTripGuides } = await import('@/data/preGeneratedTripGuides');
-        availableGuides = allTestTripGuides;
+        // const { allTestTripGuides } = await import('@/data/preGeneratedTripGuides');
+        // availableGuides = allTestTripGuides;
+        availableGuides = [];
       }
       
       // Выбираем случайный готовый trip guide из фильтрованного списка
