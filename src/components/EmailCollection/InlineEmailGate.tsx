@@ -21,6 +21,7 @@ export default function InlineEmailGate({
   const [name, setName] = useState('');
   const [emailError, setEmailError] = useState('');
   const [showThankYou, setShowThankYou] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -43,6 +44,11 @@ export default function InlineEmailGate({
 
     if (!name.trim()) {
       setEmailError('Name is required');
+      return;
+    }
+
+    if (!privacyAccepted) {
+      setEmailError('Please accept the Privacy Policy to continue');
       return;
     }
 
@@ -111,14 +117,43 @@ export default function InlineEmailGate({
               className="alfie-inline-email-input"
             />
           </div>
-          
+
+          {/* Privacy Policy Checkbox */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '8px',
+            marginBottom: '16px',
+            fontSize: '13px'
+          }}>
+            <input
+              type="checkbox"
+              id="privacy-checkbox"
+              checked={privacyAccepted}
+              onChange={(e) => setPrivacyAccepted(e.target.checked)}
+              disabled={isSubmitting}
+              style={{ marginTop: '2px', flexShrink: 0 }}
+            />
+            <label htmlFor="privacy-checkbox" style={{ color: '#6b7280', lineHeight: '1.4' }}>
+              I agree to the{' '}
+              <a
+                href="https://www.outdoorable.co/policy"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'var(--alfie-green)', textDecoration: 'underline' }}
+              >
+                Privacy Policy
+              </a>
+            </label>
+          </div>
+
           {emailError && (
             <p className="alfie-inline-email-error">{emailError}</p>
           )}
 
           <button
             type="submit"
-            disabled={isSubmitting || !email.trim() || !name.trim()}
+            disabled={isSubmitting || !email.trim() || !name.trim() || !privacyAccepted}
             className="alfie-inline-email-button"
           >
             {isSubmitting ? 'Unlocking...' : 'Unlock'}

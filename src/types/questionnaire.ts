@@ -194,17 +194,6 @@ export const INSPIRE_ME_QUESTIONS: Question[] = [
     required: true,
   },
   {
-    id: 'party_details',
-    type: 'text',
-    text: 'Tell me the headcount — or the occasion if there\'s one.',
-    placeholder: '6 people, 40th birthday',
-    required: true,
-    conditionalLogic: {
-      showIf: 'party_type',
-      values: ['Friends', 'Family with young kids (under 12)', 'Family with kids 12–18', 'Multi-gen family', 'Work trip / Colleagues']
-    },
-  },
-  {
     id: 'fitness_level',
     type: 'single-choice',
     text: 'How intense are you willing to go on outdoor activities?',
@@ -284,20 +273,6 @@ export const INSPIRE_ME_QUESTIONS: Question[] = [
       'Food tours',
       'Markets'
     ],
-    required: true,
-  },
-  {
-    id: 'dealbreakers',
-    type: 'text',
-    text: 'What should I skip suggesting? Crowds, long drives, extreme heat…?',
-    placeholder: 'No overnight buses, avoid humid destinations',
-    required: true,
-  },
-  {
-    id: 'trip_feel',
-    type: 'text',
-    text: 'Last one — tell me how you want this trip to feel or anything else you\'d like me to know.',
-    placeholder: 'Relaxed with a few big active days',
     required: true,
   }
 ];
@@ -406,17 +381,6 @@ export const I_KNOW_WHERE_QUESTIONS: Question[] = [
       'Fixed',
       'Flexible'
     ],
-    required: true,
-    conditionalLogic: {
-      showIf: 'trip_structure',
-      values: ['🧳 Multi‑destination (changing locations/lodging)']
-    },
-  },
-  {
-    id: 'anchors_multi',
-    type: 'text',
-    text: 'Flights, hotels, or tours already set in stone?',
-    placeholder: 'Flight into Florence; Vatican tour booked',
     required: true,
     conditionalLogic: {
       showIf: 'trip_structure',

@@ -189,13 +189,21 @@ export default function QuestionCard({
   return (
     <div className="alfie-questions-section">
       {/* Question Display */}
-      <div className="alfie-question-display">
-        <div className="alfie-avatar">
-          <Image src="/images/alfie.png" alt="Alfie" width={60} height={60} />
-        </div>
-        <div className="alfie-question-text">
+      <div className="alfie-question-display-simple">
+        <h2 className="alfie-question-text-simple">
           {question.text}
-        </div>
+        </h2>
+        {/* Multi-select hint */}
+        {(question.type === 'multiple-choice' || question.type === 'multi-with-other') && (
+          <p style={{
+            fontSize: '14px',
+            color: 'var(--alfie-text-light)',
+            margin: '8px 0 0 0',
+            fontStyle: 'italic'
+          }}>
+            select as many as you like
+          </p>
+        )}
       </div>
 
       {/* Answer Options */}
@@ -203,15 +211,35 @@ export default function QuestionCard({
         {renderInput()}
       </div>
 
-      {/* Navigation - только для multi-choice */}
+      {/* Navigation - для всех типов кроме single-choice */}
       {(question.type === 'multiple-choice' || question.type === 'multi-with-other' || question.type === 'text' || question.type === 'range') && (
         <div className="alfie-navigation">
+          {!isFirst && (
+            <button
+              onClick={onPrev}
+              className="alfie-nav-button"
+            >
+              ← Back
+            </button>
+          )}
           <button
             onClick={onNext}
             disabled={!isValid}
             className={`alfie-nav-button ${isValid ? 'primary' : ''}`}
           >
             {isLast ? '✓ Complete' : 'Next →'}
+          </button>
+        </div>
+      )}
+
+      {/* Navigation для single-choice - только кнопка назад */}
+      {question.type === 'single-choice' && !isFirst && (
+        <div className="alfie-navigation" style={{ justifyContent: 'flex-start' }}>
+          <button
+            onClick={onPrev}
+            className="alfie-nav-button"
+          >
+            ← Back
           </button>
         </div>
       )}
