@@ -1,5 +1,29 @@
 # Outdoorable TripGuide Widget - Changelog
 
+## [v1.9.0] - September 19, 2025 (Session 10 - UX/UI Improvements & Bug Fixes)
+
+### 🎨 Major UI/UX Improvements
+- **Go Back Navigation**: Added "← Back" button to all question types (not just multi-select)
+- **Multi-Select Hints**: Added "select as many as you like" guidance for multiple choice questions
+- **Enhanced Text Fields**: Doubled padding size (12px → 24px) and added min-height (60px) for better usability
+- **New Color Scheme**: Updated from green to modern teal/cyan theme with improved contrast
+
+### 🐛 Critical Bug Fixes
+- **Email Flow Fixed**: Removed duplicate email request in "I Know Where" flow - now only asks once at TripGuide stage
+- **Navigation Bug Fixed**: Eliminated redirect loop after email submission that sent users back to previous questions
+- **Privacy Compliance**: Added mandatory Privacy Policy checkbox with link to https://www.outdoorable.co/policy
+
+### 🗑️ Content Optimization
+- **Streamlined Questionnaires**: Removed 4 redundant/optional questions across both flows:
+  - "Get Inspiration": Removed party details, dealbreakers, and trip feel questions
+  - "Know Where I'm Going": Removed flights/hotels anchor question
+- **Improved Flow Logic**: Simplified question progression for better user experience
+
+### 📊 Technical Changes
+- **Updated Components**: Modified QuestionCard, InlineEmailGate, IKnowWhereFlow, and questionnaire definitions
+- **CSS Enhancements**: New styling for buttons, inputs, and navigation elements
+- **Form Validation**: Enhanced email form with privacy policy validation
+
 ## [v1.8.0] - September 11, 2025 (Session 9 - Expert Matching System Testing & Production Validation)
 
 ### 🧪 Comprehensive Production Testing
