@@ -25,31 +25,31 @@ export default function QuestionCard({
 }: QuestionCardProps) {
   const [otherText, setOtherText] = useState('');
   const [showOtherInput, setShowOtherInput] = useState(false);
-  const [justNavigatedBack, setJustNavigatedBack] = useState(false);
+  const [userJustClicked, setUserJustClicked] = useState(false);
 
-  // Автоматический переход для single-choice
+  // Автоматический переход для single-choice - только если пользователь только что кликнул
   useEffect(() => {
-    if (question.type === 'single-choice' && value && isValid && !justNavigatedBack) {
+    if (question.type === 'single-choice' && value && isValid && userJustClicked) {
       const timer = setTimeout(() => {
         onNext();
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [value, question.type, isValid, onNext, justNavigatedBack]);
+  }, [value, question.type, isValid, onNext, userJustClicked]);
 
-  // Очистка Other input при смене вопроса
+  // Очистка состояния при смене вопроса
   useEffect(() => {
     setOtherText('');
     setShowOtherInput(false);
-    setJustNavigatedBack(false);
+    setUserJustClicked(false); // Сбрасываем флаг клика
   }, [question.id]);
 
   const handlePrev = () => {
-    setJustNavigatedBack(true);
     if (onPrev) onPrev();
   };
 
   const handleSingleChoice = (option: string) => {
+    setUserJustClicked(true); // Отмечаем что пользователь кликнул
     onChange(option);
   };
 
