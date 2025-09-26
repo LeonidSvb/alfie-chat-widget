@@ -87,12 +87,13 @@ export default function TripGuideLoading({
   }, [facts.length]);
 
   return (
-    <div className="alfie-embedded-chat" style={{ 
-      maxWidth: '500px',
-      margin: '0 auto',
-      padding: '40px 30px',
-      textAlign: 'center'
-    }}>
+    <div className="alfie-loading-container"
+         style={{
+           maxWidth: '500px',
+           margin: '0 auto',
+           padding: '20px 15px',
+           textAlign: 'center'
+         }}>
       {/* Progress milestone like in ProgressBar */}
       <div className="alfie-progress-header" style={{ marginBottom: '20px' }}>
         <span className="alfie-progress-milestone">
