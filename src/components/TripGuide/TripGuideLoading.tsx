@@ -100,30 +100,19 @@ export default function TripGuideLoading({
         </span>
       </div>
 
-      {/* Alfie Avatar with consistent styling */}
-      <div className="alfie-loading-avatar-container">
-        {/* Main spinning border - matching progress bar style */}
-        <div className="alfie-loading-spinner-outer" />
-        
-        {/* Secondary ring for depth */}
-        <div className="alfie-loading-spinner-inner" />
-        
-        {/* Alfie Avatar - matching main widget sizing */}
-        <div className="alfie-loading-avatar">
-          <Image
-            src="/images/alfie-avatar.png"
-            alt="Alfie Avatar"
-            width={60}
-            height={60}
-            style={{
-              borderRadius: '50%',
-              objectFit: 'cover'
-            }}
-            onError={() => {
-              console.log('Alfie avatar image failed to load');
-            }}
-          />
-        </div>
+      {/* Simple Alfie Avatar with pulse animation */}
+      <div className="alfie-simple-loading-avatar">
+        <Image
+          src="/images/alfie-avatar.png"
+          alt="Alfie Avatar"
+          width={80}
+          height={80}
+          style={{
+            borderRadius: '50%',
+            objectFit: 'cover'
+          }}
+          priority
+        />
       </div>
 
       {/* Loading message - matching Alfie greeting style */}

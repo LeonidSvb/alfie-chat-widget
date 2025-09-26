@@ -488,6 +488,44 @@
     100% { transform: rotate(360deg); }
 }
 
+/* Simple Loading Avatar - iframe-friendly */
+.alfie-simple-loading-avatar {
+    margin: 20px 0;
+    animation: pulse 2s ease-in-out infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+/* Mobile responsive improvements for loading */
+@media (max-width: 480px) {
+    .alfie-embedded-chat {
+        padding: 20px 15px !important;
+        max-width: 100% !important;
+    }
+
+    .alfie-simple-loading-avatar {
+        margin: 15px 0;
+    }
+
+    .alfie-greeting-bubble {
+        font-size: 14px !important;
+        padding: 12px 16px !important;
+        margin: 10px 0 !important;
+    }
+}
+
 /* Final Results */
 .alfie-final-results {
     margin-top: 20px;
