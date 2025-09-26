@@ -132,7 +132,14 @@ export default function InlineEmailGate({
               checked={privacyAccepted}
               onChange={(e) => setPrivacyAccepted(e.target.checked)}
               disabled={isSubmitting}
-              style={{ marginTop: '2px', flexShrink: 0 }}
+              style={{
+                marginTop: '2px',
+                flexShrink: 0,
+                width: '16px',
+                height: '16px',
+                accentColor: 'var(--alfie-green)',
+                display: 'block !important'
+              }}
             />
             <label htmlFor="privacy-checkbox" style={{ color: '#6b7280', lineHeight: '1.4' }}>
               I agree to the{' '}

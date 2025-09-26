@@ -14,9 +14,9 @@ export default function FlowSelector({ onFlowSelect }: FlowSelectorProps) {
           <Image src="/images/alfie.png" alt="Alfie" width={60} height={60} />
         </div>
         <div className="alfie-greeting">
-          <div className="alfie-greeting-bubble">
+          <h2 className="alfie-question-text-simple">
             Hi, I'm Alfie 👋 Tell me what you're dreaming up and I'll share free tailored trip ideas to inspire your next adventure.
-          </div>
+          </h2>
         </div>
       </div>
       
