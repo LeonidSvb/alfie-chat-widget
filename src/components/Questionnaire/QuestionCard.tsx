@@ -190,20 +190,30 @@ export default function QuestionCard({
     <div className="alfie-questions-section">
       {/* Question Display */}
       <div className="alfie-question-display-simple">
-        <h2 className="alfie-question-text-simple">
-          {question.text}
-        </h2>
-        {/* Multi-select hint */}
-        {(question.type === 'multiple-choice' || question.type === 'multi-with-other') && (
-          <p style={{
-            fontSize: '14px',
-            color: 'var(--alfie-text-light)',
-            margin: '8px 0 0 0',
-            fontStyle: 'italic'
-          }}>
-            select as many as you like
-          </p>
-        )}
+        <Image
+          src="/images/alfie-avatar.png"
+          alt="Alfie"
+          width={32}
+          height={32}
+          className="alfie-question-avatar"
+          priority
+        />
+        <div className="alfie-question-content">
+          <h2 className="alfie-question-text-simple">
+            {question.text}
+          </h2>
+          {/* Multi-select hint */}
+          {(question.type === 'multiple-choice' || question.type === 'multi-with-other') && (
+            <p style={{
+              fontSize: '14px',
+              color: 'var(--alfie-text-light)',
+              margin: '8px 0 0 0',
+              fontStyle: 'italic'
+            }}>
+              select as many as you like
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Answer Options */}
