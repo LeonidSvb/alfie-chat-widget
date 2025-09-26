@@ -6,9 +6,10 @@ import QuestionCard from './QuestionCard';
 
 interface IKnowWhereFlowProps {
   onComplete: (data: QuestionnaireData) => void;
+  onBackToFlowSelection: () => void;
 }
 
-export default function IKnowWhereFlow({ onComplete }: IKnowWhereFlowProps) {
+export default function IKnowWhereFlow({ onComplete, onBackToFlowSelection }: IKnowWhereFlowProps) {
   
   const {
     currentQuestion,
@@ -34,7 +35,11 @@ export default function IKnowWhereFlow({ onComplete }: IKnowWhereFlowProps) {
   };
 
   const handlePrev = () => {
-    prevQuestion();
+    if (isFirst) {
+      onBackToFlowSelection();
+    } else {
+      prevQuestion();
+    }
   };
 
   const handleAnswerChange = (value: any) => {

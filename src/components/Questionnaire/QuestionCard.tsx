@@ -13,34 +13,41 @@ export interface QuestionCardProps {
   isValid: boolean;
 }
 
-export default function QuestionCard({ 
-  question, 
-  value, 
-  onChange, 
-  onNext, 
-  onPrev, 
-  isFirst, 
-  isLast, 
-  isValid 
+export default function QuestionCard({
+  question,
+  value,
+  onChange,
+  onNext,
+  onPrev,
+  isFirst,
+  isLast,
+  isValid
 }: QuestionCardProps) {
   const [otherText, setOtherText] = useState('');
   const [showOtherInput, setShowOtherInput] = useState(false);
+  const [justNavigatedBack, setJustNavigatedBack] = useState(false);
 
   // Автоматический переход для single-choice
   useEffect(() => {
-    if (question.type === 'single-choice' && value && isValid) {
+    if (question.type === 'single-choice' && value && isValid && !justNavigatedBack) {
       const timer = setTimeout(() => {
         onNext();
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [value, question.type, isValid, onNext]);
+  }, [value, question.type, isValid, onNext, justNavigatedBack]);
 
   // Очистка Other input при смене вопроса
   useEffect(() => {
     setOtherText('');
     setShowOtherInput(false);
+    setJustNavigatedBack(false);
   }, [question.id]);
+
+  const handlePrev = () => {
+    setJustNavigatedBack(true);
+    if (onPrev) onPrev();
+  };
 
   const handleSingleChoice = (option: string) => {
     onChange(option);
@@ -224,14 +231,12 @@ export default function QuestionCard({
       {/* Navigation - для всех типов кроме single-choice */}
       {(question.type === 'multiple-choice' || question.type === 'multi-with-other' || question.type === 'text' || question.type === 'range') && (
         <div className="alfie-navigation">
-          {!isFirst && (
-            <button
-              onClick={onPrev}
-              className="alfie-nav-button"
-            >
-              ← Back
-            </button>
-          )}
+          <button
+            onClick={handlePrev}
+            className="alfie-nav-button"
+          >
+            {isFirst ? '← Choose Flow' : '← Back'}
+          </button>
           <button
             onClick={onNext}
             disabled={!isValid}
@@ -243,13 +248,13 @@ export default function QuestionCard({
       )}
 
       {/* Navigation для single-choice - только кнопка назад */}
-      {question.type === 'single-choice' && !isFirst && (
+      {question.type === 'single-choice' && (
         <div className="alfie-navigation" style={{ justifyContent: 'flex-start' }}>
           <button
-            onClick={onPrev}
+            onClick={handlePrev}
             className="alfie-nav-button"
           >
-            ← Back
+            {isFirst ? '← Choose Flow' : '← Back'}
           </button>
         </div>
       )}

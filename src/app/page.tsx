@@ -217,9 +217,9 @@ export default function HomePage({
       
       case 'questionnaire':
         if (selectedFlow === 'inspire-me') {
-          return <InspireMeFlow onComplete={handleQuestionnaireComplete} />;
+          return <InspireMeFlow onComplete={handleQuestionnaireComplete} onBackToFlowSelection={handleBackToSelection} />;
         } else if (selectedFlow === 'i-know-where') {
-          return <IKnowWhereFlow onComplete={handleQuestionnaireComplete} />;
+          return <IKnowWhereFlow onComplete={handleQuestionnaireComplete} onBackToFlowSelection={handleBackToSelection} />;
         }
         return null;
       

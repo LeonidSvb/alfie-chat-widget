@@ -6,9 +6,10 @@ import QuestionCard from './QuestionCard';
 
 interface InspireMeFlowProps {
   onComplete: (data: QuestionnaireData) => void;
+  onBackToFlowSelection: () => void;
 }
 
-export default function InspireMeFlow({ onComplete }: InspireMeFlowProps) {
+export default function InspireMeFlow({ onComplete, onBackToFlowSelection }: InspireMeFlowProps) {
   const {
     currentQuestion,
     currentQuestionIndex,
@@ -33,7 +34,11 @@ export default function InspireMeFlow({ onComplete }: InspireMeFlowProps) {
   };
 
   const handlePrev = () => {
-    prevQuestion();
+    if (isFirst) {
+      onBackToFlowSelection();
+    } else {
+      prevQuestion();
+    }
   };
 
   const handleAnswerChange = (value: any) => {
